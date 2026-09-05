@@ -36,6 +36,7 @@ export type Product = {
   eyebrow: string;
   description: string;
   image: string;
+  secondaryImage?: string;
   accent: string;
   badge: string;
   highlight: string;
@@ -52,8 +53,9 @@ export const products: Product[] = [
     category: 'Urology',
     eyebrow: 'Lithotripsy & HoLEP Platform',
     description:
-      'High-precision holmium laser system with super-imposed modulated pulse shaping to minimize stone retropulsion and maximize stone ablation efficiency.',
-    image: '/products/blaze-prime-holmium-laser-clean.png',
+      'Allengers BLAZE-prime Holmium laser is used to generate laser beam which is intended for lithotripsy and HoLEP. Advanced compressor based turbo cooling system to enhance laser beam quality and efficiency of the laser. BLAZE-prime has an Advanced long pulse laser with a super imposed modulated pulse to minimize retropulsion and enhanced the ablation rate.',
+    image: '/products/blaze-prime-nobg-1.png',
+    secondaryImage: '/products/blaze-prime-nobg-2.png',
     accent: 'from-[#dbeafe] via-[#eff6ff] to-[#f0f9ff]',
     badge: 'Urology Flagship',
     highlight: '100W / 65W / 30W Laser',
@@ -937,8 +939,9 @@ const carouselSlides = [
     category: 'Urology Flagship',
     tagline: 'Super-Imposed Pulse Modulation for Superior Stone Fragmentation & HoLEP',
     description:
-      'Engineered with advanced pulse shaping technology to minimize retropulsion, maximize surgical precision, and reduce operative time in challenging endourology procedures.',
-    image: '/products/blaze-prime-holmium-laser-clean.png',
+      'Allengers BLAZE-prime Holmium laser is used to generate laser beam which is intended for lithotripsy and HoLEP. Advanced compressor based turbo cooling system to enhance laser beam quality and efficiency of the laser. BLAZE-prime has an Advanced long pulse laser with a super imposed modulated pulse to minimize retropulsion and enhanced the ablation rate.',
+    image: '/products/blaze-prime-nobg-1.png',
+    secondaryImage: '/products/blaze-prime-nobg-2.png',
     accentBg: 'from-[#0b283d] via-[#103854] to-[#081e2e]',
     accentColor: '#38bdf8',
     glowColor: 'bg-[#079cd4]/35',
@@ -1151,12 +1154,28 @@ function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) =
                     {/* Concentric Rotating Ring */}
                     <div className="pointer-events-none absolute h-[320px] w-[320px] sm:h-[400px] sm:w-[400px] rounded-full border border-dashed border-white/20 hud-spin" />
 
-                    {/* Floating Equipment Image */}
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="product-float product-shadow-3d relative z-20 max-h-[340px] sm:max-h-[420px] w-auto max-w-[85%] object-contain"
-                    />
+                    {/* Floating Equipment Image - Dual Model Showcase for BLAZE-prime or Single Model */}
+                    {'secondaryImage' in slide && slide.secondaryImage ? (
+                      <div className="relative z-20 flex items-end justify-center w-full">
+                        <img
+                          src={slide.image}
+                          alt={`${slide.title} Model 1`}
+                          className="product-float product-shadow-3d relative z-20 max-h-[300px] sm:max-h-[390px] w-auto object-contain"
+                        />
+                        <img
+                          src={slide.secondaryImage}
+                          alt={`${slide.title} Model 2`}
+                          className="product-float product-shadow-3d relative z-10 max-h-[250px] sm:max-h-[330px] w-auto object-contain -ml-8 sm:-ml-12 opacity-95"
+                          style={{ animationDelay: '1.2s' }}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src={slide.image}
+                        alt={slide.title}
+                        className="product-float product-shadow-3d relative z-20 max-h-[340px] sm:max-h-[420px] w-auto max-w-[85%] object-contain"
+                      />
+                    )}
 
                     {/* Ground Reflection Shadow */}
                     <div className="absolute bottom-4 h-7 w-[65%] rounded-[50%] bg-black/40 blur-xl z-10" />
@@ -1356,13 +1375,21 @@ function Home() {
                     </div>
                   </div>
 
-                  <div className="relative flex min-h-[220px] w-full items-center justify-center sm:w-60">
+                  <div className="relative flex min-h-[220px] w-full items-center justify-center sm:w-64">
                     <div className="absolute h-40 w-40 rounded-full bg-[#079cd4]/20 blur-2xl" />
-                    <img
-                      src="/products/blaze-prime-holmium-laser-clean.png"
-                      alt="Holmium Laser"
-                      className="product-float product-shadow relative z-10 max-h-[200px] object-contain transition duration-500 group-hover:scale-105"
-                    />
+                    <div className="relative z-10 flex items-end justify-center">
+                      <img
+                        src="/products/blaze-prime-nobg-1.png"
+                        alt="BLAZE-prime Holmium Laser"
+                        className="product-float product-shadow relative z-20 max-h-[195px] object-contain transition duration-500 group-hover:scale-105"
+                      />
+                      <img
+                        src="/products/blaze-prime-nobg-2.png"
+                        alt="BLAZE Compact Console"
+                        className="product-float product-shadow relative z-10 max-h-[160px] -ml-6 object-contain transition duration-500 group-hover:scale-105"
+                        style={{ animationDelay: '1.2s' }}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -1931,11 +1958,27 @@ function ProductDetail({ slug }: { slug: string }) {
             <div className="absolute h-72 w-72 rounded-full bg-white/90 blur-3xl" />
             <div className="absolute h-64 w-64 rounded-full border border-white/80 hud-spin" />
 
-            <img
-              src={product.image}
-              alt={product.name}
-              className="product-float product-shadow-3d relative z-10 max-h-[360px] w-auto max-w-[85%] object-contain"
-            />
+            {product.secondaryImage ? (
+              <div className="relative z-10 flex items-end justify-center">
+                <img
+                  src={product.image}
+                  alt={`${product.name} Model 1`}
+                  className="product-float product-shadow-3d relative z-20 max-h-[330px] sm:max-h-[380px] w-auto object-contain"
+                />
+                <img
+                  src={product.secondaryImage}
+                  alt={`${product.name} Model 2`}
+                  className="product-float product-shadow-3d relative z-10 max-h-[270px] sm:max-h-[320px] w-auto object-contain -ml-6 sm:-ml-10 opacity-95"
+                  style={{ animationDelay: '1.2s' }}
+                />
+              </div>
+            ) : (
+              <img
+                src={product.image}
+                alt={product.name}
+                className="product-float product-shadow-3d relative z-10 max-h-[360px] w-auto max-w-[85%] object-contain"
+              />
+            )}
           </div>
         </section>
 
