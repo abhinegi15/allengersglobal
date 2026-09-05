@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Route, Switch, useLocation, useRoute } from 'wouter';
 import {
   Activity,
@@ -192,6 +192,26 @@ function Shell({ children }: { children: ReactNode }) {
   return <div className="noise min-h-dvh bg-[#f7fbfa]"><Header onEnquire={() => setEnquiryOpen(true)} />{children}<Footer onEnquire={() => setEnquiryOpen(true)} />{enquiryOpen && <EnquiryModal onClose={() => setEnquiryOpen(false)} />}</div>;
 }
 
+function Reveal({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.14 });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return <div ref={ref} className={`scroll-reveal ${visible ? 'is-visible' : ''} ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
+}
+
 function Home() {
   const [active, setActive] = useState(0);
   const heroSlides = [
@@ -214,11 +234,36 @@ function Home() {
           <div className="reveal reveal-delay-2 relative flex min-h-[330px] items-center justify-center lg:min-h-[460px]">
             <div className="absolute h-[320px] w-[320px] rounded-full bg-white/65 blur-2xl sm:h-[420px] sm:w-[420px]" />
             <div className="absolute bottom-10 h-7 w-[68%] rounded-[50%] bg-[#376b75]/15 blur-xl" />
-            <img src={slide.image} alt={slide.label} className="product-shadow relative z-10 max-h-[430px] w-[78%] object-contain transition-opacity duration-300 sm:w-[76%]" data-testid="img-hero-product" />
+            <img src={slide.image} alt={slide.label} className="product-shadow product-float relative z-10 max-h-[430px] w-[78%] object-contain transition-opacity duration-300 sm:w-[76%]" data-testid="img-hero-product" />
             <div className="absolute right-0 top-8 z-20 hidden w-36 rounded-2xl border border-white/80 bg-white/70 p-4 backdrop-blur-md sm:block"><p className="text-[.58rem] font-bold uppercase tracking-[.16em] text-[#0f778b]">Designed for</p><p className="mt-2 text-sm font-bold leading-5 text-[#14364b]">The moments that matter.</p></div>
           </div>
         </div>
         <div className="relative mx-auto flex max-w-[1240px] items-center justify-between px-5 pb-8 lg:px-8"><div className="flex gap-2">{heroSlides.map((item, index) => <button key={item.label} onClick={() => setActive(index)} className={`h-1 rounded-full transition-all ${active === index ? 'w-14 bg-[#0f778b]' : 'w-6 bg-[#a8c7c8]'}`} aria-label={`Show ${item.label}`} data-testid={`button-hero-slide-${index}`} />)}</div><span className="text-xs font-bold text-[#6e8790]">0{active + 1} / 0{heroSlides.length}</span></div>
+      </section>
+
+      <section className="overflow-hidden border-b border-[#d8e7e6] bg-white">
+        <Reveal className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8 lg:py-24">
+          <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+            <div>
+              <p className="eyebrow text-[#079cd4]">Precision in practice</p>
+              <h2 className="mt-5 max-w-lg font-display text-4xl font-bold leading-[1.02] tracking-[-.045em] text-[#14364b] sm:text-5xl">Every detail is designed for the care journey.</h2>
+            </div>
+            <p className="max-w-xl text-lg leading-8 text-[#506875]">From the first signal to the final decision, Allengers systems help care teams work with more clarity, confidence, and control.</p>
+          </div>
+          <div className="mt-14 grid gap-4 md:grid-cols-3">
+            {[
+              { number: '01', title: 'See clearly', copy: 'Readable information and purposeful interfaces keep the important details in view.', icon: Activity },
+              { number: '02', title: 'Move confidently', copy: 'Reliable performance helps teams spend less time troubleshooting and more time caring.', icon: ShieldCheck },
+              { number: '03', title: 'Stay supported', copy: 'A responsive partner remains close from installation to every next step.', icon: HeartPulse },
+            ].map(({ number, title, copy, icon: Icon }, index) => (
+              <Reveal key={title} delay={index * 100} className="group rounded-2xl border border-[#d8e7e6] bg-[#f7fbfa] p-7 transition duration-500 hover:-translate-y-2 hover:border-[#079cd4]/40 hover:shadow-[0_18px_45px_rgba(20,54,75,.1)] sm:p-8">
+                <div className="flex items-start justify-between"><Icon className="text-[#079cd4] transition duration-500 group-hover:scale-110 group-hover:text-[#e33136]" size={28} /><span className="font-mono text-xs font-bold text-[#e33136]">{number}</span></div>
+                <h3 className="mt-12 font-display text-2xl font-bold text-[#14364b]">{title}</h3>
+                <p className="mt-3 text-sm leading-6 text-[#6a8089]">{copy}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Reveal>
       </section>
 
       <section id="about" className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32">
@@ -226,7 +271,31 @@ function Home() {
         <div className="mt-16 grid gap-px overflow-hidden rounded-2xl border border-[#d8e7e6] bg-[#d8e7e6] sm:grid-cols-3"><div className="bg-white p-7 sm:p-9"><ShieldCheck className="text-[#0f778b]" size={27} /><p className="mt-7 font-display text-2xl font-bold text-[#14364b]">Clinician-led</p><p className="mt-3 text-sm leading-6 text-[#6a8089]">Every detail begins with a real workflow and a real person.</p></div><div className="bg-white p-7 sm:p-9"><Gauge className="text-[#0f778b]" size={27} /><p className="mt-7 font-display text-2xl font-bold text-[#14364b]">Built to perform</p><p className="mt-3 text-sm leading-6 text-[#6a8089]">Reliable systems that keep their promise in demanding moments.</p></div><div className="bg-white p-7 sm:p-9"><HeartPulse className="text-[#0f778b]" size={27} /><p className="mt-7 font-display text-2xl font-bold text-[#14364b]">Closer support</p><p className="mt-3 text-sm leading-6 text-[#6a8089]">A responsive partner, from installation through every next step.</p></div></div>
       </section>
 
-      <section className="overflow-hidden bg-[#14364b] py-5 text-white"><div className="marquee flex w-max items-center gap-12 whitespace-nowrap">{['PATIENT MONITORING', 'UROLOGY', 'NEURO DIAGNOSTICS', 'CARDIOLOGY', 'LAPAROSCOPY', 'PATIENT MONITORING', 'UROLOGY', 'NEURO DIAGNOSTICS'].map((item, i) => <span key={`${item}-${i}`} className="flex items-center gap-12 text-xs font-bold tracking-[.2em] text-[#bdd9da]">{item}<span className="h-2 w-2 rounded-full bg-[#f6b95c]" /></span>)}</div></section>
+      <section className="bg-[#14364b] text-white">
+        <Reveal className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8 lg:py-24">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:items-end">
+            <div>
+              <p className="eyebrow text-[#8bd5ed]">The care connection</p>
+              <h2 className="mt-5 max-w-md font-display text-4xl font-bold leading-[1.02] tracking-[-.045em] sm:text-5xl">Technology works better when people stay connected.</h2>
+            </div>
+            <div className="grid gap-8 sm:grid-cols-3">
+              {[
+                ['Listen', 'We start with the everyday reality of the people using the system.'],
+                ['Shape', 'We turn clinical needs into practical, dependable technology.'],
+                ['Stay close', 'We keep supporting your team long after the first conversation.'],
+              ].map(([title, copy], index) => (
+                <Reveal key={title} delay={index * 100} className="border-t border-white/20 pt-5">
+                  <span className="font-mono text-xs font-bold text-[#e33136]">0{index + 1}</span>
+                  <h3 className="mt-8 font-display text-2xl font-bold">{title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-[#b9ced4]">{copy}</p>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </section>
+
+      <section className="overflow-hidden bg-[#14364b] py-5 text-white"><div className="marquee flex w-max items-center gap-12 whitespace-nowrap">{['PATIENT MONITORING', 'UROLOGY', 'NEURO DIAGNOSTICS', 'CARDIOLOGY', 'LAPAROSCOPY', 'PATIENT MONITORING', 'UROLOGY', 'NEURO DIAGNOSTICS'].map((item, i) => <span key={`${item}-${i}`} className="flex items-center gap-12 text-xs font-bold tracking-[.2em] text-[#bdd9da]">{item}<span className="h-2 w-2 rounded-full bg-[#e33136]" /></span>)}</div></section>
 
       <section className="mx-auto max-w-[1240px] px-5 py-24 lg:px-8 lg:py-32"><div className="flex flex-wrap items-end justify-between gap-6"><div><p className="eyebrow text-[#0f778b]">Explore the range</p><h2 className="mt-5 font-display text-4xl font-bold tracking-[-.045em] text-[#14364b] sm:text-5xl">Made for the moments<br /><span className="text-[#96b7b8]">that matter most.</span></h2></div><Link href="/products" className="group flex items-center gap-2 text-sm font-bold text-[#0f778b]" data-testid="link-home-all-products">View all products <ArrowRight size={17} className="transition group-hover:translate-x-1" /></Link></div><div className="mt-14 grid gap-5 md:grid-cols-3">{products.slice(0, 3).map((product, index) => <ProductCard product={product} key={product.slug} featured={index === 0} />)}</div></section>
 
