@@ -1013,6 +1013,7 @@ const carouselSlides = [
 function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) => void }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [progress, setProgress] = useState(0);
+  const touchStartX = useRef(0);
 
   const duration = 5000; // 5 seconds per slide
   const step = 50; // update every 50ms
@@ -1033,8 +1034,6 @@ function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) =
     return () => clearInterval(interval);
   }, [currentSlide]);
 
-  const slide = carouselSlides[currentSlide];
-
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? carouselSlides.length - 1 : prev - 1));
   };
@@ -1043,8 +1042,22 @@ function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) =
     setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    if (deltaX > 40) prevSlide();
+    if (deltaX < -40) nextSlide();
+  };
+
   return (
-    <section className="relative overflow-hidden border-b border-[#0f354f]">
+    <section
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="relative overflow-hidden border-b border-[#0f354f]"
+    >
       {/* Top Timer Progress Line */}
       <div className="absolute top-0 left-0 z-30 h-[4px] w-full bg-black/30">
         <div
@@ -1053,105 +1066,116 @@ function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) =
         />
       </div>
 
-      {/* Dynamic Slide Background with Rich Modality Colors */}
-      <div
-        className={`relative transition-all duration-700 bg-gradient-to-br ${slide.accentBg} text-white py-14 lg:py-20`}
-      >
-        {/* Subtle Background Medical Grid */}
-        <div className="site-grid absolute inset-0 opacity-25 pointer-events-none" />
-
-        {/* Ambient Halo Behind Image */}
+      {/* ============================================================== */}
+      {/* HORIZONTAL SLIDING TRACK (True Physical Sliding Motion)       */}
+      {/* ============================================================== */}
+      <div className="w-full overflow-hidden relative">
         <div
-          className={`pointer-events-none absolute right-1/4 top-1/2 -translate-y-1/2 h-[420px] w-[420px] rounded-full ${slide.glowColor} blur-3xl transition-all duration-700`}
-        />
+          className="flex w-full transition-transform duration-700 ease-out"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {carouselSlides.map((slide, index) => (
+            <div
+              key={slide.slug}
+              className={`w-full shrink-0 min-w-full relative bg-gradient-to-br ${slide.accentBg} text-white py-14 lg:py-20`}
+            >
+              {/* Subtle Background Medical Grid */}
+              <div className="site-grid absolute inset-0 opacity-25 pointer-events-none" />
 
-        <div className="relative mx-auto max-w-[1280px] px-5 lg:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] min-h-[460px]">
-            {/* Left Content Column */}
-            <div className="z-20 max-w-2xl">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#38bdf8] shadow-xs backdrop-blur-md">
-                <Sparkles size={14} className="text-[#f6b95c]" />
-                <span>{slide.badge}</span>
-                <span className="text-white/40">•</span>
-                <span className="text-white/80">{slide.category}</span>
-              </div>
-
-              {/* Title & Tagline */}
-              <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.08]">
-                {slide.title}
-              </h1>
-
-              <p
-                className="mt-3 font-display text-base font-semibold sm:text-lg"
-                style={{ color: slide.accentColor }}
-              >
-                {slide.tagline}
-              </p>
-
-              <p className="mt-3 max-w-xl text-sm leading-6 text-[#bad3e3]">
-                {slide.description}
-              </p>
-
-              {/* Specs Pills */}
-              <div className="mt-6 flex flex-wrap gap-2">
-                {slide.specs.map((spec) => (
-                  <span
-                    key={spec}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-white shadow-xs backdrop-blur-xs"
-                  >
-                    <Check size={14} style={{ color: slide.accentColor }} />
-                    {spec}
-                  </span>
-                ))}
-              </div>
-
-              {/* CTA Row */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <Link
-                  href={`/products/${slide.slug}`}
-                  className="flex items-center gap-2 rounded-full bg-[#079cd4] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition duration-200 hover:bg-[#0284c7] hover:scale-105"
-                >
-                  Explore Specifications <ArrowRight size={15} />
-                </Link>
-
-                <button
-                  onClick={() => onEnquire(slide.title)}
-                  className="cursor-pointer flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md transition duration-200 hover:bg-white hover:text-[#14364b]"
-                >
-                  Request Official Quote
-                </button>
-              </div>
-            </div>
-
-            {/* Right Product Image Column */}
-            <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[460px]">
-              {/* Concentric Rotating Ring */}
-              <div className="pointer-events-none absolute h-[320px] w-[320px] sm:h-[400px] sm:w-[400px] rounded-full border border-dashed border-white/20 hud-spin" />
-
-              {/* Floating Equipment Image */}
-              <img
-                key={slide.slug}
-                src={slide.image}
-                alt={slide.title}
-                className="product-float product-shadow-3d relative z-20 max-h-[340px] sm:max-h-[420px] w-auto max-w-[85%] object-contain"
+              {/* Ambient Halo Behind Image */}
+              <div
+                className={`pointer-events-none absolute right-1/4 top-1/2 -translate-y-1/2 h-[420px] w-[420px] rounded-full ${slide.glowColor} blur-3xl transition-all duration-700`}
               />
 
-              {/* Ground Reflection Shadow */}
-              <div className="absolute bottom-4 h-7 w-[65%] rounded-[50%] bg-black/40 blur-xl z-10" />
+              <div className="relative mx-auto max-w-[1280px] px-5 lg:px-8">
+                <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] min-h-[460px]">
+                  {/* Left Content Column */}
+                  <div className="z-20 max-w-2xl">
+                    {/* Badge */}
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#38bdf8] shadow-xs backdrop-blur-md">
+                      <Sparkles size={14} className="text-[#f6b95c]" />
+                      <span>{slide.badge}</span>
+                      <span className="text-white/40">•</span>
+                      <span className="text-white/80">{slide.category}</span>
+                    </div>
 
-              {/* Verified Quality Floating Badge */}
-              <div className="absolute right-2 top-6 z-30 rounded-2xl border border-white/20 bg-[#071f30]/85 p-3.5 shadow-xl backdrop-blur-md">
-                <div className="flex items-center gap-2 text-[#38bdf8]">
-                  <BadgeCheck size={16} />
-                  <span className="text-xs font-bold text-white">Certified Quality</span>
+                    {/* Title & Tagline */}
+                    <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl lg:leading-[1.08]">
+                      {slide.title}
+                    </h1>
+
+                    <p
+                      className="mt-3 font-display text-base font-semibold sm:text-lg"
+                      style={{ color: slide.accentColor }}
+                    >
+                      {slide.tagline}
+                    </p>
+
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-[#bad3e3]">
+                      {slide.description}
+                    </p>
+
+                    {/* Specs Pills */}
+                    <div className="mt-6 flex flex-wrap gap-2">
+                      {slide.specs.map((spec) => (
+                        <span
+                          key={spec}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-white shadow-xs backdrop-blur-xs"
+                        >
+                          <Check size={14} style={{ color: slide.accentColor }} />
+                          {spec}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* CTA Row */}
+                    <div className="mt-8 flex flex-wrap items-center gap-4">
+                      <Link
+                        href={`/products/${slide.slug}`}
+                        className="flex items-center gap-2 rounded-full bg-[#079cd4] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition duration-200 hover:bg-[#0284c7] hover:scale-105"
+                      >
+                        Explore Specifications <ArrowRight size={15} />
+                      </Link>
+
+                      <button
+                        onClick={() => onEnquire(slide.title)}
+                        className="cursor-pointer flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md transition duration-200 hover:bg-white hover:text-[#14364b]"
+                      >
+                        Request Official Quote
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Product Image Column */}
+                  <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[460px]">
+                    {/* Concentric Rotating Ring */}
+                    <div className="pointer-events-none absolute h-[320px] w-[320px] sm:h-[400px] sm:w-[400px] rounded-full border border-dashed border-white/20 hud-spin" />
+
+                    {/* Floating Equipment Image */}
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="product-float product-shadow-3d relative z-20 max-h-[340px] sm:max-h-[420px] w-auto max-w-[85%] object-contain"
+                    />
+
+                    {/* Ground Reflection Shadow */}
+                    <div className="absolute bottom-4 h-7 w-[65%] rounded-[50%] bg-black/40 blur-xl z-10" />
+
+                    {/* Verified Quality Floating Badge */}
+                    <div className="absolute right-2 top-6 z-30 rounded-2xl border border-white/20 bg-[#071f30]/85 p-3.5 shadow-xl backdrop-blur-md">
+                      <div className="flex items-center gap-2 text-[#38bdf8]">
+                        <BadgeCheck size={16} />
+                        <span className="text-xs font-bold text-white">Certified Quality</span>
+                      </div>
+                      <p className="mt-0.5 text-[.7rem] text-[#9fc0d4]">
+                        ISO 13485:2016 & CE Approved
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-0.5 text-[.7rem] text-[#9fc0d4]">
-                  ISO 13485:2016 & CE Approved
-                </p>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
