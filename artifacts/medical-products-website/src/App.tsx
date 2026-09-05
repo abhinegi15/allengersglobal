@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link, Route, Switch, useLocation, useRoute } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Link, Route, Switch, useLocation } from 'wouter';
 import {
   Activity,
   ArrowRight,
@@ -8,13 +7,8 @@ import {
   Award,
   BadgeCheck,
   Check,
-  ChevronDown,
-  ChevronLeft,
   ChevronRight,
-  Compass,
-  Cpu,
-  FileText,
-  Flame,
+  Clock,
   Globe2,
   HeartPulse,
   Mail,
@@ -23,15 +17,14 @@ import {
   Phone,
   Play,
   Search,
-  Send,
-  Shield,
   ShieldCheck,
   Sparkles,
-  Stethoscope,
   X,
-  Zap,
 } from 'lucide-react';
 
+// =============================================================================
+// REAL ALLENGERS PRODUCT DATA (10 Authentic Systems)
+// =============================================================================
 export type Product = {
   slug: string;
   name: string;
@@ -40,7 +33,6 @@ export type Product = {
   eyebrow: string;
   description: string;
   image: string;
-  cleanImage: string;
   accent: string;
   badge: string;
   highlight: string;
@@ -56,17 +48,16 @@ export const products: Product[] = [
     category: 'Urology',
     eyebrow: 'Lithotripsy & HoLEP Platform',
     description:
-      'High-precision holmium laser system with super-imposed modulated pulse shaping to minimize retropulsion and maximize stone ablation efficiency.',
-    image: '/products/blaze-prime-holmium-laser.jpeg',
-    cleanImage: '/products/blaze-prime-holmium-laser-clean.png',
-    accent: 'from-[#079cd4]/20 via-[#079cd4]/5 to-transparent',
+      'High-precision holmium laser system with super-imposed modulated pulse shaping to minimize stone retropulsion and maximize ablation efficiency.',
+    image: '/products/blaze-prime-holmium-laser-clean.png',
+    accent: 'from-[#dceaf8] via-[#eff5fa] to-[#f7fbfa]',
     badge: 'Urology Flagship',
     highlight: '100W / 65W / 30W Laser',
     specs: [
-      'Power Options: 100W, 65W, and 30W variants',
-      'Pulse Energy: 0.1 J to 5.0 J adjustable',
+      'Power Configurations: 100W, 65W, and 30W variants',
+      'Pulse Energy: 0.1 J to 5.0 J adjustable range',
       'Pulse Frequency: Up to 80 Hz high repetition rate',
-      '12” Bright color interactive touchscreen display',
+      '12” Bright color swivel interactive touchscreen',
       'Dual inverter compressor turbo cooling system',
       'Dedicated dusting and fragmentation operating modes',
     ],
@@ -86,18 +77,17 @@ export const products: Product[] = [
     eyebrow: 'Ultra-Fine Dusting & Tissue Surgery',
     description:
       'Extreme repetition rate thulium fiber laser with hybrid air cooling delivering superior stone dusting and bloodless soft tissue resection.',
-    image: '/products/fiberlaze-thulium-laser.jpeg',
-    cleanImage: '/products/fiberlaze-thulium-laser-clean.png',
-    accent: 'from-[#00b4d8]/20 via-[#00b4d8]/5 to-transparent',
+    image: '/products/fiberlaze-thulium-laser-clean.png',
+    accent: 'from-[#dcf2f5] via-[#eef9fa] to-[#f7fbfa]',
     badge: 'High Frequency',
     highlight: 'Up to 2500 Hz Pulse Rate',
     specs: [
       'Power Configurations: 60W and 35W available',
       'Extreme Pulse Rate: Up to 2500 Hz (60W) / 1600 Hz (35W)',
-      'Seven selectable levels of pulse width',
+      'Seven selectable levels of pulse width modulation',
       'Hybrid air-cooling system (no water refill needed)',
       'Standard single-phase 220V power supply compatibility',
-      'Integrated aiming beam with adjustable brightness',
+      'Integrated green aiming beam with adjustable brightness',
     ],
     features: [
       'Hands-free Ready/Standby selection with dual foot pedal',
@@ -112,12 +102,11 @@ export const products: Product[] = [
     name: 'Allengers Morcellator (DynaCut)',
     shortName: 'Morcellator',
     category: 'Laparoscopy',
-    eyebrow: 'Tissue Extraction Platform',
+    eyebrow: 'Laparoscopic Tissue Extraction',
     description:
       'Smooth, controlled laparoscopic tissue morcellation with variable speed cutting, twin collection canisters, and mobile stand with dual foot pedal.',
-    image: '/products/dynacut-morcellator.jpeg',
-    cleanImage: '/products/dynacut-morcellator-clean.png',
-    accent: 'from-[#14b8a6]/20 via-[#14b8a6]/5 to-transparent',
+    image: '/products/dynacut-morcellator-clean.png',
+    accent: 'from-[#d9f3f0] via-[#edf8f6] to-[#f7fbfa]',
     badge: 'Laparoscopy',
     highlight: 'Variable Speed Control',
     specs: [
@@ -133,7 +122,7 @@ export const products: Product[] = [
       'Zero-vibration handpiece reduces surgeon fatigue',
       'Airtight vacuum sealing prevents loss of pneumoperitoneum',
       'Quick disassembly for hospital-grade cleaning and sterilization',
-      'Seamlessly fits laparoscopic trocar ports',
+      'Seamlessly fits laparoscopic trocar ports (12mm / 15mm)',
     ],
   },
   {
@@ -144,9 +133,8 @@ export const products: Product[] = [
     eyebrow: 'High-Fidelity Brain Mapping',
     description:
       'State-of-the-art EEG systems for recording and analyzing electrical brain activity, identifying neurological disorders, and localizing seizure origins.',
-    image: '/products/virgo-electroencephalograph.jpeg',
-    cleanImage: '/products/virgo-electroencephalograph-clean.png',
-    accent: 'from-[#0284c7]/20 via-[#0284c7]/5 to-transparent',
+    image: '/products/virgo-electroencephalograph-clean.png',
+    accent: 'from-[#f5ebe0] via-[#faf5f0] to-[#f7fbfa]',
     badge: 'Neurology Flagship',
     highlight: '32-Channel DSP Acquisition',
     specs: [
@@ -173,9 +161,8 @@ export const products: Product[] = [
     eyebrow: 'Advanced Neuromuscular Diagnostics',
     description:
       'High-fidelity EMG/EP/NCS platform designed for electromyography, nerve conduction velocity studies, and evoked potential analysis.',
-    image: '/products/scorpio-electromyograph.jpeg',
-    cleanImage: '/products/scorpio-electromyograph-clean.png',
-    accent: 'from-[#3b82f6]/20 via-[#3b82f6]/5 to-transparent',
+    image: '/products/scorpio-electromyograph-clean.png',
+    accent: 'from-[#e2eafb] via-[#f0f4fd] to-[#f7fbfa]',
     badge: 'Multi-Modality',
     highlight: 'EMG, NCV, SEP, VEP, BAEP',
     specs: [
@@ -202,9 +189,8 @@ export const products: Product[] = [
     eyebrow: 'Comprehensive Sleep Diagnostics',
     description:
       'Hospital-grade polysomnography platform for overnight sleep staging, respiratory monitoring, apnea indexing, and limb movement recording.',
-    image: '/products/polysomnograph-psg.jpeg',
-    cleanImage: '/products/polysomnograph-psg-clean.png',
-    accent: 'from-[#6366f1]/20 via-[#6366f1]/5 to-transparent',
+    image: '/products/polysomnograph-psg-clean.png',
+    accent: 'from-[#e8ecf8] via-[#f2f4fc] to-[#f7fbfa]',
     badge: 'Sleep Medicine',
     highlight: 'AASM Compliant Analysis',
     specs: [
@@ -231,9 +217,8 @@ export const products: Product[] = [
     eyebrow: 'Cardiac Stress Test System',
     description:
       'Heavy-duty treadmill stress test system with 30+ years of manufacturing heritage, featuring a rock-steady digital baseline and custom Bruce protocols.',
-    image: '/products/gemini-treadmill-tmt.jpeg',
-    cleanImage: '/products/gemini-treadmill-tmt-clean.png',
-    accent: 'from-[#10b981]/20 via-[#10b981]/5 to-transparent',
+    image: '/products/gemini-treadmill-tmt-clean.png',
+    accent: 'from-[#e9f4ec] via-[#f3f9f5] to-[#f7fbfa]',
     badge: 'Cardiology Classic',
     highlight: 'Heavy-Duty 20 km/h AC Drive',
     specs: [
@@ -260,9 +245,8 @@ export const products: Product[] = [
     eyebrow: 'Diagnostic Electrocardiograph',
     description:
       'High-precision 12-channel electrocardiograph featuring an interactive LCD screen, alphanumeric silicone keypad, and high-speed thermal printing.',
-    image: '/products/pisces-electrocardiograph.jpeg',
-    cleanImage: '/products/pisces-electrocardiograph-clean.png',
-    accent: 'from-[#06b6d4]/20 via-[#06b6d4]/5 to-transparent',
+    image: '/products/pisces-electrocardiograph-clean.png',
+    accent: 'from-[#e2f3f5] via-[#f1f9fa] to-[#f7fbfa]',
     badge: 'Cardiac Essential',
     highlight: '12-Lead Simultaneous Print',
     specs: [
@@ -289,9 +273,8 @@ export const products: Product[] = [
     eyebrow: 'Acute Care Bedside Monitor',
     description:
       'Clinical-grade bedside monitor delivering crystal clear real-time waveforms, multi-parameter tracking, and 120 hours of continuous trend storage.',
-    image: '/products/libra-multipara-monitor.jpeg',
-    cleanImage: '/products/libra-multipara-monitor-clean.png',
-    accent: 'from-[#0ea5e9]/20 via-[#0ea5e9]/5 to-transparent',
+    image: '/products/libra-multipara-monitor-clean.png',
+    accent: 'from-[#d8f2ee] via-[#edf7f5] to-[#f7fbfa]',
     badge: 'Critical Care',
     highlight: '15.6” High-Brightness Display',
     specs: [
@@ -318,9 +301,8 @@ export const products: Product[] = [
     eyebrow: 'Ambulatory Cardiac Monitoring',
     description:
       'Feather-light ambulatory ECG recorder for 24–48 hour continuous cardiac recording with automated arrhythmia detection and HRV analysis software.',
-    image: '/products/ecg-holter.jpeg',
-    cleanImage: '/products/ecg-holter-clean.png',
-    accent: 'from-[#38bdf8]/20 via-[#38bdf8]/5 to-transparent',
+    image: '/products/ecg-holter-clean.png',
+    accent: 'from-[#e0f2fe] via-[#f0f9ff] to-[#f7fbfa]',
     badge: 'Ambulatory Care',
     highlight: 'Feather-Light (<80g)',
     specs: [
@@ -350,71 +332,77 @@ const categories = [
   'Laparoscopy',
 ] as const;
 
-// -----------------------------------------------------------------------------
-// NAVIGATION BAR
-// -----------------------------------------------------------------------------
+// =============================================================================
+// HEADER NAVIGATION
+// =============================================================================
 function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/products', label: 'Products' },
-    { href: '/#specialties', label: 'Specialties' },
-    { href: '/#video', label: 'Company Video' },
-    { href: '/#about', label: 'About Us' },
-  ];
+  const scrollToSection = (sectionId: string) => {
+    setMenuOpen(false);
+    if (location !== '/') {
+      window.location.href = '/#' + sectionId;
+      return;
+    }
+    const elem = document.getElementById(sectionId);
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'border-b border-white/10 bg-[#07131e]/90 shadow-2xl backdrop-blur-xl'
-          : 'border-b border-white/5 bg-[#0a1826]/75 backdrop-blur-md'
-      }`}
-    >
-      {/* Top Brand Accent Line */}
-      <div className="h-[2px] w-full bg-gradient-to-r from-[#079cd4] via-[#38bdf8] to-[#e33136]" />
+    <header className="sticky top-0 z-40 border-b border-[#d8e7e6] bg-[#f7fbfa]/95 shadow-sm backdrop-blur-md">
+      {/* Brand Top Line */}
+      <div className="h-[3px] w-full bg-gradient-to-r from-[#079cd4] via-[#38bdf8] to-[#e33136]" />
 
-      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-5 lg:px-8">
+      <div className="mx-auto flex h-[76px] max-w-[1240px] items-center justify-between px-5 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <img
             src="/allengers-logo.png"
             alt="Allengers Global Healthcare"
-            className="h-10 w-auto object-contain transition hover:opacity-95 sm:h-11"
+            className="h-10 w-auto object-contain transition hover:opacity-90 sm:h-11"
           />
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
-          {navLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className={`text-xs font-bold uppercase tracking-wider transition duration-200 ${
-                location === item.href
-                  ? 'text-[#079cd4]'
-                  : 'text-[#94a9ba] hover:text-white'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          <Link
+            href="/"
+            className={`text-xs font-bold uppercase tracking-[.1em] transition ${
+              location === '/' ? 'text-[#079cd4]' : 'text-[#5b707d] hover:text-[#079cd4]'
+            }`}
+          >
+            Home
+          </Link>
+          <Link
+            href="/products"
+            className={`text-xs font-bold uppercase tracking-[.1em] transition ${
+              location.startsWith('/products') ? 'text-[#079cd4]' : 'text-[#5b707d] hover:text-[#079cd4]'
+            }`}
+          >
+            Products
+          </Link>
+          <button
+            onClick={() => scrollToSection('video')}
+            className="cursor-pointer text-xs font-bold uppercase tracking-[.1em] text-[#5b707d] transition hover:text-[#079cd4]"
+          >
+            Company Video
+          </button>
+          <button
+            onClick={() => scrollToSection('about')}
+            className="cursor-pointer text-xs font-bold uppercase tracking-[.1em] text-[#5b707d] transition hover:text-[#079cd4]"
+          >
+            Our Approach
+          </button>
         </nav>
 
-        {/* Action Button */}
-        <div className="hidden items-center gap-4 md:flex">
+        {/* Right Action Callouts */}
+        <div className="hidden items-center gap-5 md:flex">
           <a
             href="tel:18002668800"
-            className="flex items-center gap-2 text-xs font-semibold text-[#8eb0c4] transition hover:text-[#079cd4]"
+            className="flex items-center gap-2 text-xs font-bold text-[#385365] transition hover:text-[#079cd4]"
           >
             <Phone size={14} className="text-[#079cd4]" />
             <span>1800-266-8800</span>
@@ -422,240 +410,167 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
 
           <button
             onClick={() => onEnquire()}
-            className="group relative overflow-hidden rounded-full bg-gradient-to-r from-[#079cd4] to-[#0284c7] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#079cd4]/25 transition-all duration-300 hover:shadow-xl hover:shadow-[#079cd4]/40 hover:scale-105"
+            className="cursor-pointer rounded-full bg-[#079cd4] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm transition hover:bg-[#0284c7] hover:shadow-md"
           >
-            <span className="relative z-10 flex items-center gap-1.5">
-              Enquire Now <ArrowUpRight size={14} className="transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </span>
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            Enquire Now
           </button>
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* Mobile Menu Hamburger */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-white/20 md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f3f1] text-[#14364b] transition md:hidden"
           aria-label="Toggle menu"
         >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
-      {/* Mobile Dropdown */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="border-b border-white/10 bg-[#07131e] px-6 py-6 md:hidden"
-          >
-            <div className="flex flex-col gap-4">
-              {navLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="text-sm font-bold uppercase tracking-wider text-white hover:text-[#079cd4]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="mt-2 border-t border-white/10 pt-4">
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onEnquire();
-                  }}
-                  className="w-full rounded-full bg-[#079cd4] py-3 text-center text-xs font-bold uppercase tracking-wider text-white"
-                >
-                  Enquire Now
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile Menu Dropdown */}
+      {menuOpen && (
+        <div className="border-t border-[#d8e7e6] bg-[#f7fbfa] px-5 py-5 md:hidden">
+          <div className="grid gap-4">
+            <Link
+              href="/"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm font-bold text-[#14364b]"
+            >
+              Home
+            </Link>
+            <Link
+              href="/products"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm font-bold text-[#14364b]"
+            >
+              Products
+            </Link>
+            <button
+              onClick={() => scrollToSection('video')}
+              className="text-left text-sm font-bold text-[#14364b]"
+            >
+              Company Video
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="text-left text-sm font-bold text-[#14364b]"
+            >
+              Our Approach
+            </button>
+            <a
+              href="tel:18002668800"
+              className="flex items-center gap-2 text-sm font-bold text-[#079cd4]"
+            >
+              <Phone size={16} /> 1800-266-8800 (Toll-Free)
+            </a>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onEnquire();
+              }}
+              className="mt-2 rounded-full bg-[#079cd4] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#0284c7]"
+            >
+              Enquire Now
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
 
-// -----------------------------------------------------------------------------
+// =============================================================================
 // FOOTER
-// -----------------------------------------------------------------------------
+// =============================================================================
 function Footer({ onEnquire }: { onEnquire: (productName?: string) => void }) {
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[#060e17] text-white">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[600px] -translate-x-1/2 rounded-full bg-[#079cd4]/10 blur-[120px]" />
-
-      {/* Category Ribbon */}
-      <div className="border-b border-white/5 bg-[#091522] py-4">
-        <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 text-xs font-semibold text-[#8ca3b5]">
-          {products.slice(0, 8).map((p, i) => (
-            <span key={p.slug} className="flex items-center gap-6">
-              <Link href={`/products/${p.slug}`} className="transition hover:text-[#079cd4]">
-                {p.shortName}
-              </Link>
-              {i < 7 && <span className="text-white/15">/</span>}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="mx-auto grid max-w-[1280px] gap-12 px-5 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        {/* Col 1: Brand */}
+    <footer className="border-t border-[#d8e7e6] bg-[#14364b] text-white">
+      <div className="mx-auto grid max-w-[1240px] gap-12 px-5 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.2fr_1.2fr] lg:px-8">
         <div>
-          <img src="/allengers-logo.png" alt="Allengers" className="h-10 w-auto object-contain" />
-          <p className="mt-4 text-xs leading-6 text-[#8ea4b5]">
-            Allengers Global Healthcare Private Limited is an ISO 9001:2015, EN ISO 13485:2016, BIS, and CE certified pioneer manufacturing medical diagnostic and surgical equipment.
+          <img
+            src="/allengers-logo.png"
+            alt="Allengers Global Healthcare"
+            className="h-10 w-auto brightness-0 invert"
+          />
+          <p className="mt-5 max-w-sm text-sm leading-6 text-[#b9ced4]">
+            Incorporated in 2009 in Chandigarh, India. Leading manufacturer of certified medical diagnostic & surgical equipment built for clinical excellence.
           </p>
-          <div className="mt-6 flex items-center gap-3">
-            <a
-              href="https://www.instagram.com/allengersglobal/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-[#8ea4b5] transition hover:bg-[#079cd4] hover:text-white"
-            >
-              IG
+          <button
+            onClick={() => onEnquire()}
+            className="mt-6 flex cursor-pointer items-center gap-2 text-sm font-bold text-[#f6b95c] transition hover:text-white"
+          >
+            Start a consultation <ArrowUpRight size={16} />
+          </button>
+        </div>
+
+        <div>
+          <p className="eyebrow text-[#83c8cc]">Quick Navigation</p>
+          <div className="mt-5 grid gap-3 text-sm text-[#b9ced4]">
+            <Link href="/" className="transition hover:text-white">
+              Home
+            </Link>
+            <Link href="/products" className="transition hover:text-white">
+              All Products Catalog
+            </Link>
+            <a href="/#video" className="transition hover:text-white">
+              Corporate Video
             </a>
-            <a
-              href="https://www.facebook.com/allengersglobal/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-[#8ea4b5] transition hover:bg-[#079cd4] hover:text-white"
-            >
-              FB
-            </a>
-            <a
-              href="https://www.linkedin.com/company/allengers-medical-systems-limited/"
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-xs font-bold text-[#8ea4b5] transition hover:bg-[#079cd4] hover:text-white"
-            >
-              IN
+            <a href="/#about" className="transition hover:text-white">
+              About Allengers Global
             </a>
           </div>
         </div>
 
-        {/* Col 2: Quick Links */}
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-[#079cd4]">
-            Quick Navigation
-          </h4>
-          <ul className="mt-4 space-y-2.5 text-xs text-[#8ea4b5]">
-            <li>
-              <Link href="/" className="transition hover:text-white">
-                Home Overview
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Full Product Catalog (10 Systems)
-              </Link>
-            </li>
-            <li>
-              <a href="#specialties" className="transition hover:text-white">
-                Clinical Specialties
-              </a>
-            </li>
-            <li>
-              <a href="#about" className="transition hover:text-white">
-                Company Profile & Certifications
-              </a>
-            </li>
-            <li>
-              <a href="#video" className="transition hover:text-white">
-                Manufacturing Video
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        {/* Col 3: Specialties */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-[#079cd4]">
-            Clinical Disciplines
-          </h4>
-          <ul className="mt-4 space-y-2.5 text-xs text-[#8ea4b5]">
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Urology & Holmium Laser
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Neurology (EEG, EMG, PSG)
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Cardiology (TMT, ECG, Holter)
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Patient Monitoring (MPM)
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="transition hover:text-white">
-                Laparoscopic Morcellation
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        {/* Col 4: Official Contact */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-widest text-[#079cd4]">
-            Official Contact
-          </h4>
-          <div className="mt-4 space-y-3 text-xs text-[#8ea4b5]">
-            <p className="flex items-start gap-2.5">
-              <MapPin size={15} className="mt-0.5 shrink-0 text-[#079cd4]" />
-              <span>S.C.O 212-214, Sector 34-A, Chandigarh (U.T.) 160022, India</span>
-            </p>
-            <p className="flex items-center gap-2.5">
-              <Phone size={15} className="shrink-0 text-[#079cd4]" />
-              <a href="tel:01726618001" className="hover:text-white">
-                0172 – 6618001
-              </a>
-            </p>
-            <p className="flex items-center gap-2.5">
-              <Phone size={15} className="shrink-0 text-[#e33136]" />
-              <span className="font-semibold text-white">Toll Free: 1800-266-8800</span>
-            </p>
-            <p className="flex items-center gap-2.5">
-              <Mail size={15} className="shrink-0 text-[#079cd4]" />
-              <a href="mailto:enquiries@allengersglobal.com" className="hover:text-white">
-                enquiries@allengersglobal.com
-              </a>
-            </p>
+          <p className="eyebrow text-[#83c8cc]">Direct Support</p>
+          <div className="mt-5 grid gap-3 text-sm text-[#b9ced4]">
+            <a
+              href="mailto:enquiries@allengersglobal.com"
+              className="flex items-center gap-2 transition hover:text-white"
+            >
+              <Mail size={15} className="shrink-0 text-[#83c8cc]" />
+              <span className="break-all">enquiries@allengersglobal.com</span>
+            </a>
+            <a
+              href="tel:01726618001"
+              className="flex items-center gap-2 transition hover:text-white"
+            >
+              <Phone size={15} className="shrink-0 text-[#83c8cc]" />
+              <span>0172 – 6618001</span>
+            </a>
+            <a
+              href="tel:18002668800"
+              className="flex items-center gap-2 font-semibold text-white transition hover:text-[#f6b95c]"
+            >
+              <Phone size={15} className="shrink-0 text-[#f6b95c]" />
+              <span>1800-266-8800 (Toll Free)</span>
+            </a>
+            <div className="flex items-start gap-2">
+              <MapPin size={15} className="mt-0.5 shrink-0 text-[#83c8cc]" />
+              <span className="text-xs leading-5">
+                S.C.O 212-213-214, Sector 34-A, Chandigarh (U.T.), 160022, India
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/5 bg-[#04090f] py-6">
-        <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-3 px-5 text-center text-xs text-[#5e7789] sm:flex-row sm:text-left lg:px-8">
-          <p>© {new Date().getFullYear()} Allengers Global Healthcare Private Limited. All rights reserved.</p>
-          <div className="flex items-center gap-5">
-            <span className="text-[#079cd4]">www.allengersglobal.com</span>
-            <span>•</span>
-            <button onClick={() => onEnquire()} className="text-white hover:underline">
-              Request Dealership
-            </button>
-          </div>
+        <div>
+          <p className="eyebrow text-[#83c8cc]">Quality & Standards</p>
+          <p className="mt-5 text-xs leading-6 text-[#b9ced4]">
+            Certified in strict compliance with <strong>ISO 9001:2015</strong>, <strong>EN ISO 13485:2016</strong>, <strong>BIS</strong>, and <strong>CE</strong> medical device directives.
+          </p>
+          <div className="mt-6 h-px bg-white/15" />
+          <p className="mt-4 text-xs text-[#83c8cc]">
+            © {new Date().getFullYear()} Allengers Global Healthcare Pvt. Ltd.
+          </p>
         </div>
       </div>
     </footer>
   );
 }
 
-// -----------------------------------------------------------------------------
-// ENQUIRY MODAL (Modern Glassmorphic)
-// -----------------------------------------------------------------------------
+// =============================================================================
+// ENQUIRY MODAL (Lead Generation Popup)
+// =============================================================================
 function EnquiryModal({
   onClose,
   initialProduct = '',
@@ -663,140 +578,129 @@ function EnquiryModal({
   onClose: () => void;
   initialProduct?: string;
 }) {
-  const [sent, setSent] = useState(false);
-  const [productChoice, setProductChoice] = useState(initialProduct || 'General Enquiry');
+  const [submitted, setSubmitted] = useState(false);
+  const [productChoice, setProductChoice] = useState(initialProduct || products[0].name);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md"
-      role="dialog"
-      aria-modal="true"
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-white/15 bg-[#0a1826] text-white shadow-2xl"
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg rounded-2xl border border-[#d8e7e6] bg-white p-6 shadow-2xl sm:p-8">
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-[#e33136]"
+          className="absolute right-5 top-5 cursor-pointer rounded-full p-2 text-[#5b707d] transition hover:bg-[#edf5f3] hover:text-[#14364b]"
           aria-label="Close"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
-        {sent ? (
-          <div className="p-10 text-center sm:p-14">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#079cd4]/20 text-[#079cd4]">
+        {submitted ? (
+          <div className="py-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#079cd4]/15 text-[#079cd4]">
               <Check size={32} />
             </div>
-            <h3 className="font-display text-2xl font-bold text-white">Enquiry Received</h3>
-            <p className="mt-3 text-sm text-[#94a9ba]">
-              Thank you for contacting Allengers Global Healthcare. Our clinical sales specialist will reach out shortly regarding{' '}
-              <strong className="text-white">{productChoice}</strong>.
+            <h3 className="mt-4 font-display text-2xl font-bold text-[#14364b]">
+              Enquiry Submitted
+            </h3>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-[#506875]">
+              Thank you for contacting Allengers Global Healthcare. Our clinical product specialist will be in touch shortly.
             </p>
-            <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-[#94a9ba]">
-              <p>Direct Support Email: <strong className="text-white">enquiries@allengersglobal.com</strong></p>
-              <p className="mt-1">Toll Free: <strong className="text-[#079cd4]">1800-266-8800</strong></p>
-            </div>
             <button
               onClick={onClose}
-              className="mt-8 rounded-full bg-[#079cd4] px-8 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#0284c7]"
+              className="mt-6 cursor-pointer rounded-full bg-[#14364b] px-6 py-2.5 text-xs font-bold text-white transition hover:bg-[#079cd4]"
             >
               Close Window
             </button>
           </div>
         ) : (
-          <div>
-            <div className="border-b border-white/10 bg-gradient-to-r from-[#0d2337] to-[#0a1826] p-8">
-              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#079cd4]">
-                <Sparkles size={14} /> Official Manufacturer Consultation
-              </span>
-              <h3 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
-                Direct Product Enquiry
-              </h3>
-              <p className="mt-1 text-xs text-[#8ca3b5]">
-                Get factory-certified specifications, pricing, and hospital demonstrations.
-              </p>
+          <>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#079cd4]">
+              <Sparkles size={14} /> Official Equipment Inquiry
             </div>
+            <h3 className="mt-2 font-display text-2xl font-bold text-[#14364b]">
+              Request Product Consultation
+            </h3>
+            <p className="mt-1 text-xs text-[#506875]">
+              Direct support from Allengers certified biomedical engineers and sales team.
+            </p>
 
             <form
-              className="grid gap-4 p-8 sm:grid-cols-2"
               onSubmit={(e) => {
                 e.preventDefault();
-                setSent(true);
+                setSubmitted(true);
               }}
+              className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2"
             >
               <div>
-                <label className="text-xs font-bold text-[#8ca3b5]">Your Name *</label>
+                <label className="text-xs font-bold text-[#385365]">Full Name *</label>
                 <input
+                  type="text"
                   required
-                  placeholder="Dr. Rajesh Kumar"
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs text-white outline-none transition focus:border-[#079cd4] focus:bg-white/10"
+                  placeholder="Dr. / Mr. / Ms."
+                  className="mt-1 w-full rounded-lg border border-[#d8e7e6] bg-[#f7fbfa] px-3.5 py-2.5 text-sm text-[#14364b] outline-none transition focus:border-[#079cd4] focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#8ca3b5]">Contact Phone *</label>
+                <label className="text-xs font-bold text-[#385365]">Contact Number *</label>
                 <input
-                  required
                   type="tel"
-                  placeholder="+91 98765 43210"
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs text-white outline-none transition focus:border-[#079cd4] focus:bg-white/10"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-[#8ca3b5]">Email Address *</label>
-                <input
                   required
-                  type="email"
-                  placeholder="doctor@hospital.org"
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs text-white outline-none transition focus:border-[#079cd4] focus:bg-white/10"
+                  placeholder="+91 or Mobile"
+                  className="mt-1 w-full rounded-lg border border-[#d8e7e6] bg-[#f7fbfa] px-3.5 py-2.5 text-sm text-[#14364b] outline-none transition focus:border-[#079cd4] focus:bg-white"
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-[#8ca3b5]">Product of Interest *</label>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-bold text-[#385365]">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@hospital.org"
+                  className="mt-1 w-full rounded-lg border border-[#d8e7e6] bg-[#f7fbfa] px-3.5 py-2.5 text-sm text-[#14364b] outline-none transition focus:border-[#079cd4] focus:bg-white"
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="text-xs font-bold text-[#385365]">Product of Interest</label>
                 <select
                   value={productChoice}
                   onChange={(e) => setProductChoice(e.target.value)}
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#0a1826] px-4 py-2.5 text-xs text-white outline-none focus:border-[#079cd4]"
+                  className="mt-1 w-full rounded-lg border border-[#d8e7e6] bg-[#f7fbfa] px-3.5 py-2.5 text-sm text-[#14364b] outline-none transition focus:border-[#079cd4] focus:bg-white"
                 >
-                  <option value="General Enquiry">General Consultation</option>
                   {products.map((p) => (
                     <option key={p.slug} value={p.name}>
-                      {p.name}
+                      {p.name} ({p.category})
                     </option>
                   ))}
-                  <option value="Dealership">Export / Dealership Enquiry</option>
                 </select>
               </div>
 
               <div className="sm:col-span-2">
-                <label className="text-xs font-bold text-[#8ca3b5]">Clinical Requirement / Message</label>
+                <label className="text-xs font-bold text-[#385365]">Clinical Requirement / Message</label>
                 <textarea
                   rows={3}
-                  placeholder="Mention your hospital department, procedural need, or required configuration..."
-                  className="mt-1.5 w-full resize-none rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-xs text-white outline-none transition focus:border-[#079cd4] focus:bg-white/10"
+                  required
+                  placeholder="Specify hospital department, bed capacity, or preferred quote options..."
+                  className="mt-1 w-full resize-none rounded-lg border border-[#d8e7e6] bg-[#f7fbfa] px-3.5 py-2.5 text-sm text-[#14364b] outline-none transition focus:border-[#079cd4] focus:bg-white"
                 />
               </div>
 
               <button
                 type="submit"
-                className="mt-2 flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#079cd4] to-[#0284c7] py-3 text-xs font-bold uppercase tracking-wider text-white shadow-lg transition hover:from-[#e33136] hover:to-[#b91c1c] sm:col-span-2"
+                className="mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-full bg-[#079cd4] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#0284c7] sm:col-span-2"
               >
-                Send Request <Send size={14} />
+                Send Request <ArrowRight size={15} />
               </button>
             </form>
-          </div>
+          </>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }
 
+// =============================================================================
+// SHELL WRAPPER
+// =============================================================================
 function Shell({
   children,
   onEnquire,
@@ -805,7 +709,7 @@ function Shell({
   onEnquire: (productName?: string) => void;
 }) {
   return (
-    <div className="min-h-screen bg-[#07131e] font-sans text-white antialiased selection:bg-[#079cd4] selection:text-white">
+    <div className="min-h-screen bg-[#f7fbfa] text-[#14364b]">
       <Header onEnquire={onEnquire} />
       {children}
       <Footer onEnquire={onEnquire} />
@@ -814,102 +718,178 @@ function Shell({
 }
 
 // =============================================================================
+// PRODUCT CARD COMPONENT
+// =============================================================================
+function ProductCard({
+  product,
+  onEnquire,
+}: {
+  product: Product;
+  onEnquire?: (name: string) => void;
+}) {
+  return (
+    <div className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[#d8e7e6] bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#079cd4]/40 hover:shadow-xl">
+      {/* Product Image Stage */}
+      <div className={`relative flex min-h-[250px] items-center justify-center bg-gradient-to-br ${product.accent} p-6`}>
+        {/* Soft Aura */}
+        <div className="absolute h-40 w-40 rounded-full bg-white/70 blur-2xl transition duration-500 group-hover:scale-110" />
+
+        <img
+          src={product.image}
+          alt={product.name}
+          className="product-shadow relative z-10 max-h-[190px] w-auto max-w-[85%] object-contain transition duration-500 group-hover:scale-105"
+        />
+
+        <div className="absolute left-4 top-4 flex items-center gap-2">
+          <span className="rounded-full bg-white/90 px-3 py-1 text-[.62rem] font-bold uppercase tracking-wider text-[#079cd4] shadow-xs">
+            {product.category}
+          </span>
+        </div>
+
+        <span className="absolute bottom-3 right-4 rounded-full bg-white/80 px-2.5 py-0.5 text-[.6rem] font-semibold text-[#5b707d]">
+          {product.highlight}
+        </span>
+      </div>
+
+      {/* Product Information */}
+      <div className="flex flex-1 flex-col justify-between p-6">
+        <div>
+          <p className="eyebrow text-[#079cd4]">{product.eyebrow}</p>
+          <h3 className="mt-2 font-display text-xl font-bold text-[#14364b] transition group-hover:text-[#079cd4]">
+            {product.name}
+          </h3>
+          <p className="mt-2 line-clamp-2 text-xs leading-5 text-[#506875]">
+            {product.description}
+          </p>
+
+          <ul className="mt-4 space-y-1.5 border-t border-[#edf5f3] pt-3">
+            {product.specs.slice(0, 2).map((spec) => (
+              <li key={spec} className="flex items-start gap-2 text-xs text-[#5b707d]">
+                <Check size={13} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                <span className="line-clamp-1">{spec}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Card CTA */}
+        <div className="mt-6 flex items-center justify-between border-t border-[#edf5f3] pt-4">
+          <Link
+            href={`/products/${product.slug}`}
+            className="flex items-center gap-1.5 text-xs font-bold text-[#079cd4] transition hover:underline"
+          >
+            Specifications <ChevronRight size={14} />
+          </Link>
+
+          {onEnquire && (
+            <button
+              onClick={() => onEnquire(product.name)}
+              className="cursor-pointer rounded-full bg-[#edf5f3] px-3.5 py-1.5 text-xs font-bold text-[#14364b] transition hover:bg-[#079cd4] hover:text-white"
+            >
+              Enquire
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
 // PAGE 1: HOME PAGE
 // =============================================================================
 function Home() {
-  const [activeHero, setActiveHero] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
   const [enquiryModalProduct, setEnquiryModalProduct] = useState<string | null>(null);
-  const [activeSpecialty, setActiveSpecialty] = useState<'Urology' | 'Neurology' | 'Cardiology'>('Urology');
 
-  const heroSystems = [
+  const heroSlides = [
     {
       slug: 'blaze-prime',
-      title: 'BLAZE-prime Holmium Laser',
-      tagline: 'High-Energy Precision Lithotripsy & HoLEP Platform',
-      highlight: 'Up to 100W Output Power | Stone Dusting Mode',
+      label: 'BLAZE-prime Holmium Laser',
+      headline: 'Precision Urology Laser Lithotripsy',
+      subhead:
+        'High-energy pulsed laser with super-imposed pulse modulation to virtually eliminate stone retropulsion and accelerate fragmentation.',
       image: '/products/blaze-prime-holmium-laser-clean.png',
       badge: 'Urology Flagship',
-      specs: ['100W/65W/30W Options', '0.1 J – 5.0 J Energy', 'Dual Inverter Cooling', '12” Swivel Touchscreen'],
+      metrics: ['Up to 100W Output', 'Dusting & Fragmentation', 'Dual Inverter Cooling'],
     },
     {
       slug: 'fiberlaze-plus',
-      title: 'FiberLAZE+ Thulium Fiber Laser',
-      tagline: 'Ultra-Fine Dusting & Rapid Soft Tissue Resection',
-      highlight: 'Extreme 2500 Hz Pulse Frequency | Hybrid Air Cooling',
+      label: 'FiberLAZE+ Thulium Fiber Laser',
+      headline: 'Ultra-Fine Stone Dusting & Resection',
+      subhead:
+        'Extreme 2500 Hz pulse repetition rate with hybrid air cooling for whisper-quiet, water-free theater operations and bloodless tissue vaporization.',
       image: '/products/fiberlaze-thulium-laser-clean.png',
       badge: 'High Frequency',
-      specs: ['Up to 2500 Hz Rate', 'Minimal Retropulsion', 'Hands-free Dual Pedal', 'Near-zero Hemorrhage'],
+      metrics: ['Up to 2500 Hz Pulse Rate', 'Hybrid Air Cooling', 'Minimal Penetration (<0.2mm)'],
     },
     {
       slug: 'neuroplot',
-      title: 'Neuroplot / VIRGO EEG',
-      tagline: 'State-of-the-Art Electroencephalography & Brain Mapping',
-      highlight: '32-Channel High-Gain Headbox | Synchronized Video',
+      label: 'Neuroplot / VIRGO EEG',
+      headline: 'State-of-the-Art Brain Wave Diagnostics',
+      subhead:
+        'High-fidelity 32-channel digital signal processing system with real-time brain mapping, synchronized video, and automated seizure alerts.',
       image: '/products/virgo-electroencephalograph-clean.png',
       badge: 'Neurology Flagship',
-      specs: ['32/24 Channel DSP', 'Spectral Brain Mapping', 'Full HD Medical Display', 'Automated Seizure Alert'],
+      metrics: ['32-Channel DSP Acquisition', 'Spectral Brain Mapping', 'Full HD Medical Display'],
     },
     {
       slug: 'gemini-treadmill',
-      title: 'Gemini TMT Machine (GEMINI-A-DX)',
-      tagline: 'Advanced Treadmill Stress Test with Stable Baseline Filter',
-      highlight: 'Heavy-Duty 20 km/h Motor | 12-Lead Real-time ECG',
+      label: 'Gemini TMT Machine (GEMINI-A-DX)',
+      headline: 'Rugged Cardiac Treadmill Stress Testing',
+      subhead:
+        'Heavy-duty AC motor with rock-steady baseline filter, simultaneous 12-lead ECG trace, and standard Bruce stress protocols.',
       image: '/products/gemini-treadmill-tmt-clean.png',
-      badge: 'Cardiology Flagship',
-      specs: ['Heavy-Duty AC Drive', '0–22% Elevation Grade', 'Bruce & Custom Protocols', 'Full Disclosure Review'],
+      badge: 'Cardiology Classic',
+      metrics: ['20 km/h AC Drive', '0–22% Elevation Grade', 'Full Disclosure ECG Storage'],
     },
     {
       slug: 'libra-mpm',
-      title: 'Libra Smart / BRIO Multipara Monitor',
-      tagline: 'Clinical-Grade Acute Care Bedside Patient Monitoring',
-      highlight: '15.6” High-Brightness Display | 120-Hour Trend Storage',
+      label: 'Libra Smart / BRIO Multipara Monitor',
+      headline: 'Intuitive Clinical Bedside Care',
+      subhead:
+        'Anti-glare 15.6” high-brightness display showing 8 real-time high-contrast waveforms and 120 hours of continuous multi-parameter trend memory.',
       image: '/products/libra-multipara-monitor-clean.png',
       badge: 'Critical Care',
-      specs: ['15.6” Touch Screen', '8 Real-time Waveforms', 'ECG, SpO2, NIBP, Temp', 'Central Station Link'],
+      metrics: ['15.6” High-Res Touchscreen', '8 Real-time Waveforms', '120h Continuous Trends'],
     },
   ];
 
-  const currentHero = heroSystems[activeHero];
+  const currentSlide = heroSlides[activeSlide];
 
   return (
-    <Shell onEnquire={(product) => setEnquiryModalProduct(product || '')}>
+    <Shell onEnquire={(p) => setEnquiryModalProduct(p || products[0].name)}>
       <main>
         {/* ============================================================== */}
-        {/* HERO SECTION WITH 3D AMBIENT LIGHT & MOTION                    */}
+        {/* HERO SECTION                                                  */}
         {/* ============================================================== */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#0a1928] via-[#081522] to-[#07131e] py-16 lg:py-24">
-          {/* 3D Background Glow Orbs */}
-          <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-[#079cd4]/15 blur-[140px]" />
-          <div className="pointer-events-none absolute -right-40 top-40 h-[500px] w-[500px] rounded-full bg-[#00b4d8]/10 blur-[150px]" />
-
-          <div className="relative mx-auto max-w-[1280px] px-5 lg:px-8">
-            <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-              {/* Left Column Text */}
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#079cd4]/30 bg-[#079cd4]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#38bdf8] backdrop-blur-md">
+        <section className="site-grid relative overflow-hidden border-b border-[#d8e7e6] bg-gradient-to-b from-[#eaf4f2] via-[#f1f8f7] to-[#f7fbfa] py-14 lg:py-20">
+          <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+              {/* Left Text */}
+              <div className="z-10 max-w-2xl">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#079cd4]/30 bg-white/80 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#079cd4] shadow-xs backdrop-blur-md">
                   <Sparkles size={14} className="text-[#f6b95c]" />
                   Allengers Global Healthcare Private Limited
                 </div>
 
-                <h1 className="mt-5 font-display text-4xl font-extrabold tracking-tight text-white sm:text-6xl lg:leading-[1.1]">
-                  Precision Medical <br />
-                  <span className="bg-gradient-to-r from-[#079cd4] via-[#38bdf8] to-white bg-clip-text text-transparent">
-                    Equipment Systems
-                  </span>
+                <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-[#14364b] sm:text-6xl lg:leading-[1.08]">
+                  {currentSlide.headline}
                 </h1>
 
-                <p className="mt-4 max-w-xl text-base font-medium text-[#b0c7d7] sm:text-lg">
-                  ISO 13485 & CE certified manufacturers of advanced Holmium & Thulium Lasers, EEG, EMG, TMT, ECG, and Multipara Monitors.
+                <p className="mt-5 max-w-xl text-base leading-7 text-[#506875] sm:text-lg">
+                  {currentSlide.subhead}
                 </p>
 
-                {/* Live System Feature Pills */}
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {currentHero.specs.map((spec) => (
+                {/* Metric Quick-Pills */}
+                <div className="mt-6 flex flex-wrap gap-2.5">
+                  {currentSlide.metrics.map((metric) => (
                     <span
-                      key={spec}
-                      className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-[#9ec4db]"
+                      key={metric}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8e7e6] bg-white/90 px-3 py-1.5 text-xs font-bold text-[#385365] shadow-xs"
                     >
-                      {spec}
+                      <Check size={14} className="text-[#079cd4]" />
+                      {metric}
                     </span>
                   ))}
                 </div>
@@ -917,252 +897,167 @@ function Home() {
                 {/* CTA Buttons */}
                 <div className="mt-8 flex flex-wrap items-center gap-4">
                   <Link
-                    href={`/products/${currentHero.slug}`}
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#079cd4] to-[#0284c7] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-xl shadow-[#079cd4]/25 transition hover:scale-105 hover:shadow-[#079cd4]/40"
+                    href={`/products/${currentSlide.slug}`}
+                    className="flex items-center gap-2 rounded-full bg-[#14364b] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#079cd4] hover:shadow-lg"
                   >
-                    Explore System <ArrowRight size={16} />
+                    Explore System <ArrowUpRight size={16} />
                   </Link>
-
                   <button
-                    onClick={() => setEnquiryModalProduct(currentHero.title)}
-                    className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-md transition hover:bg-white/15"
+                    onClick={() => setEnquiryModalProduct(currentSlide.label)}
+                    className="flex cursor-pointer items-center gap-2 rounded-full border border-[#079cd4] bg-white px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-[#079cd4] transition hover:bg-[#079cd4] hover:text-white"
                   >
-                    Request Quotation
+                    Request Quote
                   </button>
                 </div>
+              </div>
 
-                {/* Interactive System Tabs */}
-                <div className="mt-10 border-t border-white/10 pt-6">
-                  <p className="text-[.7rem] font-bold uppercase tracking-widest text-[#69889d]">
-                    Featured Systems:
+              {/* Right Floating Product Hero */}
+              <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[460px]">
+                {/* 3D Aura Halo */}
+                <div className="absolute h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-[#079cd4]/20 via-[#38bdf8]/15 to-transparent blur-3xl sm:h-[400px] sm:w-[400px]" />
+                <div className="absolute bottom-6 h-8 w-[65%] rounded-[50%] bg-[#376b75]/15 blur-xl" />
+
+                {/* Animated Floating Equipment Image */}
+                <img
+                  src={currentSlide.image}
+                  alt={currentSlide.label}
+                  className="product-float product-shadow relative z-10 max-h-[380px] w-auto max-w-[85%] object-contain"
+                />
+
+                {/* Floating Tag */}
+                <div className="absolute right-2 top-4 z-20 rounded-xl border border-white bg-white/85 p-3 shadow-md backdrop-blur-md">
+                  <p className="text-[.6rem] font-bold uppercase tracking-wider text-[#079cd4]">
+                    {currentSlide.badge}
                   </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {heroSystems.map((item, idx) => (
-                      <button
-                        key={item.slug}
-                        onClick={() => setActiveHero(idx)}
-                        className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-                          activeHero === idx
-                            ? 'bg-[#079cd4] text-white shadow-md'
-                            : 'border border-white/10 bg-white/5 text-[#8ea4b5] hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        {item.badge}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: 3D Product Float Showcase */}
-              <div className="relative flex items-center justify-center">
-                {/* 3D Depth Backdrop Card */}
-                <div className="relative flex h-[420px] w-full max-w-[480px] items-center justify-center rounded-3xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-8 shadow-2xl backdrop-blur-xl">
-                  {/* Radial spotlight behind product */}
-                  <div className="absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_center,rgba(7,156,212,0.25)_0%,transparent_70%)]" />
-
-                  {/* Real Product Image with 3D Float */}
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentHero.slug}
-                      initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9, y: -15 }}
-                      transition={{ duration: 0.4 }}
-                      className="relative z-10 flex flex-col items-center"
-                    >
-                      <img
-                        src={currentHero.image}
-                        alt={currentHero.title}
-                        className="product-float max-h-[320px] w-auto max-w-full object-contain drop-shadow-[0_30px_35px_rgba(7,156,212,0.3)]"
-                      />
-                      <div className="mt-4 text-center">
-                        <span className="text-xs font-bold text-white">{currentHero.title}</span>
-                        <p className="text-[.7rem] text-[#7eb3cf]">{currentHero.highlight}</p>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
+                  <p className="mt-1 font-display text-xs font-bold text-[#14364b]">
+                    {currentSlide.label}
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* ============================================================== */}
-        {/* STATS BAR (Live Real Figures from Original Site)               */}
-        {/* ============================================================== */}
-        <section className="relative z-20 -mt-8 mx-auto max-w-[1240px] px-5 lg:px-8">
-          <div className="grid gap-4 rounded-2xl border border-white/10 bg-[#091a29]/95 p-6 shadow-2xl backdrop-blur-xl sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#079cd4]/20 text-[#079cd4]">
-                <Building2 size={24} />
-              </div>
-              <div>
-                <p className="font-display text-2xl font-extrabold text-white">7,000+</p>
-                <p className="text-xs font-medium text-[#8ea4b5]">Clients Served Worldwide</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#14b8a6]/20 text-[#14b8a6]">
-                <Cpu size={24} />
-              </div>
-              <div>
-                <p className="font-display text-2xl font-extrabold text-white">12,000+</p>
-                <p className="text-xs font-medium text-[#8ea4b5]">Product Installations</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f59e0b]/20 text-[#f59e0b]">
-                <Globe2 size={24} />
-              </div>
-              <div>
-                <p className="font-display text-2xl font-extrabold text-white">36+</p>
-                <p className="text-xs font-medium text-[#8ea4b5]">Countries Covered</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e33136]/20 text-[#e33136]">
-                <ShieldCheck size={24} />
-              </div>
-              <div>
-                <p className="font-display text-xl font-extrabold text-white">ISO & CE</p>
-                <p className="text-xs font-medium text-[#8ea4b5]">ISO 13485, BIS, CE Certified</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================================== */}
-        {/* ALL 10 REAL PRODUCTS (Modern 3D Tilt Cards)                    */}
-        {/* ============================================================== */}
-        <section className="mx-auto max-w-[1280px] px-5 py-24 lg:px-8">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <span className="eyebrow text-[#079cd4]">Engineered For Healthcare</span>
-              <h2 className="mt-2 font-display text-3xl font-extrabold text-white sm:text-4xl">
-                Diagnostic & Surgical Product Lines
-              </h2>
-              <p className="mt-2 text-sm text-[#8ea4b5]">
-                Real equipment manufactured by Allengers Global Healthcare Private Limited.
-              </p>
-            </div>
-
-            <Link
-              href="/products"
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#079cd4] transition hover:text-[#38bdf8]"
-            >
-              View All 10 Products <ArrowRight size={14} />
-            </Link>
-          </div>
-
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.slice(0, 6).map((product) => (
-              <div
-                key={product.slug}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0e2133] to-[#091522] p-6 shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-[#079cd4]/50 hover:shadow-2xl hover:shadow-[#079cd4]/15"
-              >
-                <div>
-                  {/* Card Image Area with Glowing Backdrop */}
-                  <div className="relative flex h-52 items-center justify-center rounded-2xl bg-[#061019] p-4">
-                    <span className="absolute left-3 top-3 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[.65rem] font-bold uppercase tracking-wider text-white backdrop-blur-md">
-                      {product.category}
-                    </span>
-                    <img
-                      src={product.cleanImage}
-                      alt={product.name}
-                      className="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Card Details */}
-                  <div className="mt-5">
-                    <span className="text-[.7rem] font-bold uppercase tracking-wider text-[#079cd4]">
-                      {product.eyebrow}
-                    </span>
-                    <h3 className="mt-1 font-display text-xl font-bold text-white">
-                      {product.name}
-                    </h3>
-                    <p className="mt-2 text-xs leading-5 text-[#8ea4b5] line-clamp-2">
-                      {product.description}
-                    </p>
-
-                    {/* Specs Pills */}
-                    <div className="mt-4 space-y-1.5 border-t border-white/5 pt-3">
-                      {product.specs.slice(0, 2).map((s) => (
-                        <div key={s} className="flex items-center gap-2 text-xs text-[#b1c7d6]">
-                          <Check size={12} className="text-[#079cd4]" />
-                          <span className="truncate">{s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-4">
-                  <Link
-                    href={`/products/${product.slug}`}
-                    className="flex-1 rounded-xl bg-white/10 py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#079cd4]"
-                  >
-                    Specs & Details
-                  </Link>
+            {/* Slide Navigation Buttons */}
+            <div className="mt-10 flex items-center justify-between border-t border-[#d8e7e6]/70 pt-6">
+              <div className="flex flex-wrap gap-2">
+                {heroSlides.map((slide, idx) => (
                   <button
-                    onClick={() => setEnquiryModalProduct(product.name)}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-semibold text-[#8ea4b5] transition hover:bg-white/15 hover:text-white"
+                    key={slide.slug}
+                    onClick={() => setActiveSlide(idx)}
+                    className={`cursor-pointer rounded-full px-4 py-1.5 text-xs font-bold transition ${
+                      activeSlide === idx
+                        ? 'bg-[#079cd4] text-white shadow-xs'
+                        : 'bg-white text-[#5b707d] hover:bg-[#dceef3]'
+                    }`}
                   >
-                    Enquire
+                    {slide.label.split(' ')[0]}
                   </button>
-                </div>
+                ))}
               </div>
-            ))}
+
+              <span className="font-mono text-xs font-bold text-[#5b707d]">
+                0{activeSlide + 1} / 0{heroSlides.length}
+              </span>
+            </div>
           </div>
         </section>
 
         {/* ============================================================== */}
-        {/* YOUTUBE EMBEDDED VIDEO SECTION (User Provided)                 */}
+        {/* STATS & CREDENTIALS BANNER                                     */}
         {/* ============================================================== */}
-        <section id="video" className="border-y border-white/10 bg-gradient-to-b from-[#081522] via-[#0b1d2e] to-[#081522] py-24">
-          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
+        <section className="border-b border-[#d8e7e6] bg-white py-10">
+          <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <Globe2 size={20} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    7,000+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Clients Served Globally
+                </p>
+              </div>
+
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <Activity size={20} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    12,000+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Equipment Installations
+                </p>
+              </div>
+
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <ShieldCheck size={20} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    36+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Export Countries
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 text-[#e33136]">
+                  <Award size={20} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    ISO & CE
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Certified Medical Standards
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* YOUTUBE VIDEO SECTION (User Embedded Corporate Video)          */}
+        {/* ============================================================== */}
+        <section id="video" className="border-b border-[#d8e7e6] bg-[#edf6f7] py-20 lg:py-24">
+          <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
             <div className="text-center">
               <span className="eyebrow text-[#079cd4]">Corporate Trajectory & Innovation</span>
-              <h2 className="mt-2 font-display text-3xl font-extrabold text-white sm:text-4xl">
+              <h2 className="mt-2 font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
                 Experience Allengers Excellence in Motion
               </h2>
-              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#8ea4b5]">
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#506875]">
                 Watch our company journey, ISO certified manufacturing facilities, and medical engineering milestones.
               </p>
             </div>
 
             {/* Video Player Cinema Frame */}
-            <div className="relative mx-auto mt-12 max-w-4xl">
-              {/* Ambient Glow behind player */}
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[#079cd4]/30 via-[#38bdf8]/20 to-[#e33136]/30 blur-2xl" />
-
-              <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/20 bg-black shadow-2xl">
+            <div className="relative mx-auto mt-10 max-w-4xl">
+              <div className="aspect-video w-full overflow-hidden rounded-2xl border border-[#b5dbe0] bg-black shadow-2xl">
                 <iframe
                   className="h-full w-full"
                   src="https://www.youtube.com/embed/3rZmaoAjxNM?si=1TqBOxwzX4siMD3H"
-                  title="Allengers Global Corporate Video"
+                  title="YouTube video player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
                 />
               </div>
 
-              {/* Video Info Caption */}
-              <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md sm:flex-row">
+              {/* Video Caption Bar */}
+              <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-xl border border-[#d8e7e6] bg-white p-4 shadow-xs sm:flex-row">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#079cd4]/20 text-[#079cd4]">
-                    <Play size={16} />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#079cd4]/15 text-[#079cd4]">
+                    <Play size={18} />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-white">
+                    <p className="text-xs font-bold text-[#14364b]">
                       Allengers Milestones — Global Healthcare Pioneer
                     </p>
-                    <p className="text-[.7rem] text-[#8ea4b5]">
-                      Chandigarh, India Headquarters • 50+ Years Engineering Heritage
+                    <p className="text-[.72rem] text-[#6a8089]">
+                      Chandigarh Headquarters • 50+ Years Engineering Heritage
                     </p>
                   </div>
                 </div>
@@ -1171,9 +1066,9 @@ function Home() {
                   href="https://www.youtube.com/watch?v=3rZmaoAjxNM"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 text-xs font-semibold text-[#079cd4] hover:underline"
+                  className="flex items-center gap-1.5 text-xs font-bold text-[#079cd4] hover:underline"
                 >
-                  Watch on YouTube <ArrowUpRight size={13} />
+                  Watch on YouTube <ArrowUpRight size={14} />
                 </a>
               </div>
             </div>
@@ -1181,327 +1076,199 @@ function Home() {
         </section>
 
         {/* ============================================================== */}
-        {/* CLINICAL SPECIALTIES SHOWCASE (Interactive 3D Tabs)            */}
+        {/* FEATURED PRODUCTS PORTFOLIO                                    */}
         {/* ============================================================== */}
-        <section id="specialties" className="mx-auto max-w-[1280px] px-5 py-24 lg:px-8">
-          <div className="text-center">
-            <span className="eyebrow text-[#079cd4]">Specialized Departments</span>
-            <h2 className="mt-2 font-display text-3xl font-extrabold text-white sm:text-4xl">
-              Core Clinical Specialties
-            </h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm text-[#8ea4b5]">
-              Tailored medical equipment platforms developed for high-throughput surgery and diagnostics.
-            </p>
+        <section className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8 lg:py-24">
+          <div className="flex flex-col justify-between gap-4 border-b border-[#d8e7e6] pb-6 sm:flex-row sm:items-end">
+            <div>
+              <p className="eyebrow text-[#079cd4]">Signature Medical Platforms</p>
+              <h2 className="mt-2 font-display text-3xl font-bold text-[#14364b] sm:text-4xl">
+                Engineered for Modern Clinical Outcomes
+              </h2>
+            </div>
+            <Link
+              href="/products"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#079cd4] hover:underline"
+            >
+              View All 10 Systems <ArrowRight size={15} />
+            </Link>
+          </div>
 
-            {/* Specialty Selection Tabs */}
-            <div className="mt-8 inline-flex rounded-full border border-white/10 bg-white/5 p-1.5 backdrop-blur-md">
-              {(['Urology', 'Cardiology', 'Neurology'] as const).map((spec) => (
-                <button
-                  key={spec}
-                  onClick={() => setActiveSpecialty(spec)}
-                  className={`rounded-full px-6 py-2 text-xs font-bold transition ${
-                    activeSpecialty === spec
-                      ? 'bg-[#079cd4] text-white shadow-lg'
-                      : 'text-[#8ea4b5] hover:text-white'
-                  }`}
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {products.slice(0, 6).map((product) => (
+              <ProductCard
+                key={product.slug}
+                product={product}
+                onEnquire={(name) => setEnquiryModalProduct(name)}
+              />
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 rounded-full bg-[#14364b] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#079cd4] hover:shadow-lg"
+            >
+              Explore Complete Product Catalog <ArrowRight size={15} />
+            </Link>
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* CLINICAL PILLARS (Our Approach)                                */}
+        {/* ============================================================== */}
+        <section className="border-y border-[#d8e7e6] bg-white py-20 lg:py-24">
+          <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-end">
+              <div>
+                <p className="eyebrow text-[#079cd4]">Precision In Practice</p>
+                <h2 className="mt-4 max-w-lg font-display text-3xl font-bold leading-[1.1] text-[#14364b] sm:text-4xl">
+                  Every detail is designed for the care journey.
+                </h2>
+              </div>
+              <p className="max-w-xl text-sm leading-7 text-[#506875] sm:text-base">
+                From the first cardiac or neurological signal to laser intervention in the OR, Allengers systems help care teams work with clarity, confidence, and control.
+              </p>
+            </div>
+
+            <div className="mt-14 grid gap-6 md:grid-cols-3">
+              {[
+                {
+                  number: '01',
+                  title: 'See Clearly',
+                  copy: 'High-contrast displays, intuitive touchscreen controls, and noise-free signal acquisition keep clinical teams focused on the patient.',
+                  icon: Activity,
+                },
+                {
+                  number: '02',
+                  title: 'Move Confidently',
+                  copy: 'Rock-steady baselines, dual inverter cooling, and variable speed motors provide uninterrupted procedural performance in demanding environments.',
+                  icon: ShieldCheck,
+                },
+                {
+                  number: '03',
+                  title: 'Stay Supported',
+                  copy: 'An extensive direct network of factory-trained biomedical engineers and 24/7 technical assistance nationwide across hospitals and clinics.',
+                  icon: HeartPulse,
+                },
+              ].map(({ number, title, copy, icon: Icon }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl border border-[#d8e7e6] bg-[#f7fbfa] p-8 transition duration-300 hover:-translate-y-1 hover:border-[#079cd4]/40 hover:shadow-lg"
                 >
-                  {spec} Products
-                </button>
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#079cd4] shadow-xs">
+                      <Icon size={24} />
+                    </div>
+                    <span className="font-mono text-xs font-bold text-[#e33136]">{number}</span>
+                  </div>
+                  <h3 className="mt-6 font-display text-xl font-bold text-[#14364b]">{title}</h3>
+                  <p className="mt-2 text-xs leading-6 text-[#6a8089]">{copy}</p>
+                </div>
               ))}
             </div>
           </div>
-
-          {/* Tab Content Panels */}
-          <div className="mt-14">
-            <AnimatePresence mode="wait">
-              {activeSpecialty === 'Urology' && (
-                <motion.div
-                  key="Urology"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  className="grid items-center gap-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0d2235] to-[#091522] p-8 shadow-2xl lg:grid-cols-[1.1fr_0.9fr] lg:p-14"
-                >
-                  <div>
-                    <span className="rounded-full bg-[#079cd4]/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#38bdf8]">
-                      Endourology & Lithotripsy
-                    </span>
-                    <h3 className="mt-4 font-display text-3xl font-bold text-white">
-                      BLAZE-prime & FiberLAZE+ Laser Platforms
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[#9ec4db]">
-                      Allengers BLAZE-prime Holmium laser is engineered for Lithotripsy and HoLEP. It features an advanced compressor-based turbo cooling system to optimize laser beam stability and longevity. Equipped with super-imposed modulated pulse technology to minimize retropulsion and maximize stone ablation speed.
-                    </p>
-
-                    <div className="mt-6 space-y-2 text-xs text-[#b0c8d7]">
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#079cd4]" />
-                        <span>High pulse power (up to 100W) for large stone fragmentation</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#079cd4]" />
-                        <span>FiberLAZE+ 2500 Hz extreme repetition rate for dust generation</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#079cd4]" />
-                        <span>DynaCut Morcellator for smooth laparoscopic tissue removal</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex gap-4">
-                      <Link
-                        href="/products/blaze-prime"
-                        className="rounded-full bg-[#079cd4] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#0284c7]"
-                      >
-                        Explore BLAZE-prime
-                      </Link>
-                      <button
-                        onClick={() => setEnquiryModalProduct('BLAZE-prime Holmium Laser')}
-                        className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-white/15"
-                      >
-                        Request Quote
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center gap-4 rounded-2xl bg-[#061019] p-8">
-                    <img
-                      src="/products/blaze-prime-holmium-laser-clean.png"
-                      alt="BLAZE-prime"
-                      className="max-h-72 w-auto object-contain drop-shadow-xl"
-                    />
-                    <img
-                      src="/products/fiberlaze-thulium-laser-clean.png"
-                      alt="FiberLAZE+"
-                      className="max-h-72 w-auto object-contain drop-shadow-xl"
-                    />
-                  </div>
-                </motion.div>
-              )}
-
-              {activeSpecialty === 'Cardiology' && (
-                <motion.div
-                  key="Cardiology"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  className="grid items-center gap-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0d2235] to-[#091522] p-8 shadow-2xl lg:grid-cols-[1.1fr_0.9fr] lg:p-14"
-                >
-                  <div>
-                    <span className="rounded-full bg-[#10b981]/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#34d399]">
-                      Non-Invasive Cardiac Systems
-                    </span>
-                    <h3 className="mt-4 font-display text-3xl font-bold text-white">
-                      Gemini TMT & Pisces 12-Lead ECG
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[#9ec4db]">
-                      Allengers Gemini Series stress test systems are built with state-of-the-art electronics backed by more than 30 years of medical design experience. A heavy-duty, whisper-quiet treadmill and proprietary baseline stabilization filter ensure clinical fidelity even during rigorous high-speed stress protocols.
-                    </p>
-
-                    <div className="mt-6 space-y-2 text-xs text-[#b0c8d7]">
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#10b981]" />
-                        <span>Smooth 20 km/h AC treadmill with full-length patient handrails</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#10b981]" />
-                        <span>Pisces 1012 simultaneous 12-channel thermal printing</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#10b981]" />
-                        <span>Feather-light 3/12-lead continuous ambulatory ECG Holter</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex gap-4">
-                      <Link
-                        href="/products/gemini-treadmill"
-                        className="rounded-full bg-[#10b981] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#059669]"
-                      >
-                        Explore Gemini TMT
-                      </Link>
-                      <button
-                        onClick={() => setEnquiryModalProduct('Gemini TMT Machine')}
-                        className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-white/15"
-                      >
-                        Request Quote
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center rounded-2xl bg-[#061019] p-8">
-                    <img
-                      src="/products/gemini-treadmill-tmt-clean.png"
-                      alt="Gemini TMT"
-                      className="max-h-80 w-auto object-contain drop-shadow-xl"
-                    />
-                  </div>
-                </motion.div>
-              )}
-
-              {activeSpecialty === 'Neurology' && (
-                <motion.div
-                  key="Neurology"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -15 }}
-                  className="grid items-center gap-10 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0d2235] to-[#091522] p-8 shadow-2xl lg:grid-cols-[1.1fr_0.9fr] lg:p-14"
-                >
-                  <div>
-                    <span className="rounded-full bg-[#0284c7]/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#38bdf8]">
-                      Neurodiagnostics & Sleep Medicine
-                    </span>
-                    <h3 className="mt-4 font-display text-3xl font-bold text-white">
-                      Neuroplot EEG & Scorpio EMG/EP
-                    </h3>
-                    <p className="mt-4 text-sm leading-7 text-[#9ec4db]">
-                      Allengers Neuroplot test systems are designed using cutting-edge DSP technology for recording and monitoring brain electrical potentials, spectral brain mapping, and accurate seizure localization. Paired with our Scorpio EMG and overnight PSG sleep diagnostic solutions.
-                    </p>
-
-                    <div className="mt-6 space-y-2 text-xs text-[#b0c8d7]">
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#0284c7]" />
-                        <span>32-channel EEG headbox with impedance measurement display</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#0284c7]" />
-                        <span>Scorpio EMG/EP/NCS with dedicated ergonomic stimulator</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Check size={14} className="text-[#0284c7]" />
-                        <span>Comprehensive overnight AASM-compliant PSG sleep staging</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex gap-4">
-                      <Link
-                        href="/products/neuroplot"
-                        className="rounded-full bg-[#0284c7] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#0369a1]"
-                      >
-                        Explore Neuroplot
-                      </Link>
-                      <button
-                        onClick={() => setEnquiryModalProduct('Neuroplot EEG')}
-                        className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-white/15"
-                      >
-                        Request Quote
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center rounded-2xl bg-[#061019] p-8">
-                    <img
-                      src="/products/virgo-electroencephalograph-clean.png"
-                      alt="Neuroplot EEG"
-                      className="max-h-80 w-auto object-contain drop-shadow-xl"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </section>
 
         {/* ============================================================== */}
-        {/* ABOUT ALLENGERS (Real Verified Corporate Credentials)          */}
+        {/* ABOUT ALLENGERS GLOBAL HEALTHCARE                              */}
         {/* ============================================================== */}
-        <section id="about" className="border-t border-white/10 bg-[#06101a] py-24">
-          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-            <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-              <div>
-                <span className="eyebrow text-[#079cd4]">Corporate Profile</span>
-                <h2 className="mt-2 font-display text-3xl font-extrabold text-white sm:text-4xl">
-                  About Allengers Global Healthcare
-                </h2>
+        <section id="about" className="mx-auto max-w-[1240px] px-5 py-20 lg:px-8 lg:py-28">
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <p className="eyebrow text-[#079cd4]">About Allengers Global</p>
+              <h2 className="mt-3 font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                Technology That Earns Clinical Trust.
+              </h2>
 
-                <div className="mt-6 space-y-4 text-sm leading-7 text-[#98b3c4]">
-                  <p>
-                    Incorporated in the year <strong className="text-white">2009</strong>, <strong className="text-white">Allengers Global Healthcare Private Limited</strong> is headquartered at <strong className="text-white">Chandigarh, India</strong>, and is a pioneer in the manufacturing of medical diagnostic and surgical equipment.
-                  </p>
-                  <p>
-                    Our complete portfolio comprises Holmium Lasers, Thulium Fiber Lasers, Morcellators, EEG, EMG, PSG, TMT, ECG, Holter, and Multipara Patient Monitors (MPM).
-                  </p>
-                  <p>
-                    Our unwavering commitment to quality and safety standards is verified through audited adherence to leading global regulatory certifications including <strong className="text-[#079cd4]">ISO 9001:2015</strong>, <strong className="text-[#079cd4]">EN ISO 13485:2016</strong>, <strong className="text-[#079cd4]">BIS</strong>, and <strong className="text-[#079cd4]">CE</strong>.
-                  </p>
+              <p className="mt-6 text-sm leading-7 text-[#506875]">
+                Incorporated in the year 2009, <strong>Allengers Global Healthcare Private Limited</strong> is headquartered at Chandigarh, India, and is one of the leading manufacturers of a wide range of medical diagnostic and surgical equipment comprising Holmium Laser, Thulium Fiber Laser, EEG, EMG, PSG, TMT, ECG, Holter, and Multipara Patient Monitors.
+              </p>
+
+              <p className="mt-4 text-sm leading-7 text-[#506875]">
+                Our products are engineered with the highest quality clinical-grade components, making them functionally superior, durable, and cost-effective. Our relentless focus on quality, system engineering, and patient safety has earned international certifications including <strong>ISO 9001:2015</strong>, <strong>EN ISO 13485:2016</strong>, <strong>BIS</strong>, and <strong>CE</strong>.
+              </p>
+
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => setEnquiryModalProduct(products[0].name)}
+                  className="cursor-pointer rounded-full bg-[#079cd4] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#0284c7]"
+                >
+                  Direct Enquiry
+                </button>
+                <a
+                  href="tel:18002668800"
+                  className="flex items-center gap-2 rounded-full border border-[#d8e7e6] bg-white px-5 py-3 text-xs font-bold text-[#14364b] shadow-xs transition hover:bg-[#edf5f3]"
+                >
+                  <Phone size={14} className="text-[#079cd4]" /> 1800-266-8800
+                </a>
+              </div>
+            </div>
+
+            {/* Right Quick Info Card */}
+            <div className="rounded-3xl border border-[#d8e7e6] bg-white p-8 shadow-xl">
+              <h3 className="font-display text-xl font-bold text-[#14364b]">
+                Headquarters & Compliance
+              </h3>
+
+              <div className="mt-6 space-y-4 text-xs text-[#506875]">
+                <div className="flex items-start gap-3">
+                  <MapPin size={18} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                  <div>
+                    <p className="font-bold text-[#14364b]">Corporate Headquarters</p>
+                    <p>S.C.O 212-213-214, Sector 34-A, Chandigarh (U.T.), 160022, India</p>
+                  </div>
                 </div>
 
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="mailto:enquiries@allengersglobal.com"
-                    className="flex items-center gap-2 rounded-full bg-[#079cd4] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#e33136]"
-                  >
-                    <Mail size={14} /> enquiries@allengersglobal.com
-                  </a>
-                  <a
-                    href="tel:01726618001"
-                    className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-white/15"
-                  >
-                    <Phone size={14} /> 0172 – 6618001
-                  </a>
+                <div className="flex items-start gap-3">
+                  <Mail size={18} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                  <div>
+                    <p className="font-bold text-[#14364b]">Official Communications</p>
+                    <p>enquiries@allengersglobal.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <BadgeCheck size={18} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                  <div>
+                    <p className="font-bold text-[#14364b]">Global Accreditations</p>
+                    <p>ISO 9001:2015, EN ISO 13485:2016, BIS, and CE Certified</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock size={18} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                  <div>
+                    <p className="font-bold text-[#14364b]">Support Helpline</p>
+                    <p>Toll Free (India): 1800-266-8800 | Board: 0172 – 6618001</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Verified Badges Grid */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-                  <Award size={28} className="text-[#079cd4]" />
-                  <h4 className="mt-4 font-display text-lg font-bold text-white">
-                    ISO 13485:2016 Certified
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-[#8ea4b5]">
-                    Audited medical device quality management system ensuring patient safety and rigorous manufacturing standards.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-                  <ShieldCheck size={28} className="text-[#14b8a6]" />
-                  <h4 className="mt-4 font-display text-lg font-bold text-white">
-                    CE & BIS Regulatory Mark
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-[#8ea4b5]">
-                    Fully certified and approved for export and clinical operation across European, Asian, and Middle Eastern healthcare networks.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-                  <Globe2 size={28} className="text-[#f59e0b]" />
-                  <h4 className="mt-4 font-display text-lg font-bold text-white">
-                    Global Export Footprint
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-[#8ea4b5]">
-                    Over 36 export countries actively equipped with Allengers surgical lasers and cardiac diagnostic systems.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-                  <HeartPulse size={28} className="text-[#e33136]" />
-                  <h4 className="mt-4 font-display text-lg font-bold text-white">
-                    24/7 Clinical Service
-                  </h4>
-                  <p className="mt-2 text-xs leading-5 text-[#8ea4b5]">
-                    Dedicated biomedical field support engineering team and toll-free helpline for rapid hospital maintenance response.
-                  </p>
-                </div>
+              <div className="mt-8 rounded-xl bg-[#eaf5f4] p-4 text-center">
+                <p className="text-xs font-bold text-[#079cd4]">50+ Years Medical Heritage</p>
+                <p className="mt-0.5 text-[.7rem] text-[#6a8089]">
+                  Reliable Indian manufacturing trusted across 36+ export nations.
+                </p>
               </div>
             </div>
           </div>
         </section>
-
-        {/* Modal */}
-        {enquiryModalProduct !== null && (
-          <EnquiryModal
-            onClose={() => setEnquiryModalProduct(null)}
-            initialProduct={enquiryModalProduct}
-          />
-        )}
       </main>
+
+      {/* In-Page Modal */}
+      {enquiryModalProduct && (
+        <EnquiryModal
+          onClose={() => setEnquiryModalProduct(null)}
+          initialProduct={enquiryModalProduct}
+        />
+      )}
     </Shell>
   );
 }
 
 // =============================================================================
-// PAGE 2: PRODUCTS CATALOG PAGE
+// PAGE 2: PRODUCTS CATALOG
 // =============================================================================
 function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState<string>('All products');
@@ -1509,297 +1276,233 @@ function ProductsPage() {
   const [enquiryModalProduct, setEnquiryModalProduct] = useState<string | null>(null);
 
   const filtered = products.filter((p) => {
-    const matchesCat = activeCategory === 'All products' || p.category === activeCategory;
-    const matchesSearch = `${p.name} ${p.category} ${p.eyebrow} ${p.description}`
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchesCat && matchesSearch;
+    const matchesCategory = activeCategory === 'All products' || p.category === activeCategory;
+    const matchesSearch =
+      search.trim() === '' ||
+      `${p.name} ${p.shortName} ${p.category} ${p.eyebrow} ${p.specs.join(' ')}`
+        .toLowerCase()
+        .includes(search.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
   return (
-    <Shell onEnquire={(p) => setEnquiryModalProduct(p || '')}>
-      <main className="min-h-screen pb-24">
-        {/* Header Hero */}
-        <section className="border-b border-white/10 bg-gradient-to-b from-[#0a1826] to-[#07131e] py-16">
-          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-            <span className="eyebrow text-[#079cd4]">Product Portfolios</span>
-            <h1 className="mt-3 font-display text-4xl font-extrabold text-white sm:text-5xl">
-              All Diagnostic & Surgical Systems
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#8ea4b5]">
-              Explore all 10 certified medical equipment platforms manufactured by Allengers Global Healthcare.
-            </p>
+    <Shell onEnquire={(p) => setEnquiryModalProduct(p || products[0].name)}>
+      <main>
+        {/* Banner */}
+        <section className="site-grid border-b border-[#d8e7e6] bg-[#e8f4f1] py-16 lg:py-20">
+          <div className="mx-auto max-w-[1240px] px-5 lg:px-8">
+            <p className="eyebrow text-[#079cd4]">Complete Product Ecosystem</p>
+            <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_.65fr] lg:items-end">
+              <h1 className="font-display text-4xl font-extrabold tracking-tight text-[#14364b] sm:text-6xl">
+                Certified Precision <br />
+                <span className="text-[#079cd4]">You Can Put to Work.</span>
+              </h1>
+              <p className="text-base leading-7 text-[#506875]">
+                Explore high-performance diagnostic, surgical, and patient monitoring systems built to international hospital standards.
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* Filter Controls */}
-        <section className="mx-auto mt-10 max-w-[1280px] px-5 lg:px-8">
-          <div className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
+        {/* Filters & Search */}
+        <section className="mx-auto max-w-[1240px] px-5 py-12 lg:px-8">
+          <div className="flex flex-col gap-4 border-b border-[#d8e7e6] pb-6 lg:flex-row lg:items-center lg:justify-between">
+            {/* Category Pills */}
+            <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
+              {categories.map((category) => (
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`rounded-full px-4 py-2 text-xs font-bold transition ${
-                    activeCategory === cat
-                      ? 'bg-[#079cd4] text-white shadow'
-                      : 'bg-white/5 text-[#8ea4b5] hover:bg-white/10 hover:text-white'
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`cursor-pointer shrink-0 rounded-full px-4 py-2 text-xs font-bold transition ${
+                    activeCategory === category
+                      ? 'bg-[#14364b] text-white shadow-xs'
+                      : 'bg-[#edf5f3] text-[#5b707d] hover:bg-[#d7ebe7]'
                   }`}
                 >
-                  {cat}
+                  {category}
                 </button>
               ))}
             </div>
 
-            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 md:w-72">
+            {/* Search Input */}
+            <label className="flex items-center gap-2 rounded-full border border-[#d8e7e6] bg-white px-4 py-2 text-sm text-[#6a8089] lg:w-72">
               <Search size={16} className="text-[#079cd4]" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search products or specs..."
-                className="w-full bg-transparent text-xs text-white outline-none placeholder:text-[#6a8497]"
+                placeholder="Search products & specs..."
+                className="w-full bg-transparent text-xs outline-none placeholder:text-[#9aafb5]"
               />
-            </div>
+              {search && (
+                <button onClick={() => setSearch('')} className="cursor-pointer text-xs text-[#9aafb5] hover:text-[#14364b]">
+                  <X size={14} />
+                </button>
+              )}
+            </label>
           </div>
 
-          {/* Products Grid */}
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((prod) => (
-              <div
-                key={prod.slug}
-                className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#0e2133] to-[#091522] p-6 shadow-xl transition duration-300 hover:-translate-y-1.5 hover:border-[#079cd4]/40 hover:shadow-2xl"
-              >
-                <div>
-                  <div className="relative flex h-56 items-center justify-center rounded-2xl bg-[#061019] p-4">
-                    <span className="absolute left-3 top-3 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[.65rem] font-bold uppercase tracking-wider text-white">
-                      {prod.category}
-                    </span>
-                    <img
-                      src={prod.cleanImage}
-                      alt={prod.name}
-                      className="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-
-                  <div className="mt-5">
-                    <span className="text-[.7rem] font-bold uppercase tracking-wider text-[#079cd4]">
-                      {prod.eyebrow}
-                    </span>
-                    <h3 className="mt-1 font-display text-xl font-bold text-white">
-                      {prod.name}
-                    </h3>
-                    <p className="mt-2 text-xs leading-5 text-[#8ea4b5] line-clamp-2">
-                      {prod.description}
-                    </p>
-
-                    <div className="mt-4 space-y-1.5 border-t border-white/10 pt-3">
-                      {prod.specs.slice(0, 3).map((s) => (
-                        <div key={s} className="flex items-center gap-2 text-xs text-[#b1c7d6]">
-                          <Check size={13} className="shrink-0 text-[#079cd4]" />
-                          <span className="truncate">{s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-4">
-                  <Link
-                    href={`/products/${prod.slug}`}
-                    className="flex-1 rounded-xl bg-[#079cd4] py-2.5 text-center text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#0284c7]"
-                  >
-                    View Specifications
-                  </Link>
-                  <button
-                    onClick={() => setEnquiryModalProduct(prod.name)}
-                    className="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-semibold text-[#8ea4b5] transition hover:bg-white/15 hover:text-white"
-                  >
-                    Enquire
-                  </button>
-                </div>
-              </div>
+          {/* Product Grid */}
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((product) => (
+              <ProductCard
+                key={product.slug}
+                product={product}
+                onEnquire={(name) => setEnquiryModalProduct(name)}
+              />
             ))}
           </div>
 
           {filtered.length === 0 && (
-            <div className="my-20 rounded-3xl border border-white/10 bg-white/5 p-12 text-center">
-              <h3 className="font-display text-xl font-bold text-white">No products found</h3>
-              <p className="mt-2 text-xs text-[#8ea4b5]">Try adjusting your search criteria or category filter.</p>
+            <div className="mt-12 rounded-2xl bg-[#edf5f3] py-16 text-center">
+              <p className="font-display text-2xl font-bold text-[#14364b]">No products found</p>
+              <p className="mt-2 text-xs text-[#6a8089]">
+                Try adjusting your search criteria or category filter.
+              </p>
               <button
                 onClick={() => {
                   setSearch('');
                   setActiveCategory('All products');
                 }}
-                className="mt-6 rounded-full bg-[#079cd4] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-white"
+                className="mt-4 cursor-pointer rounded-full bg-[#079cd4] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#0284c7]"
               >
                 Reset Filters
               </button>
             </div>
           )}
         </section>
-
-        {enquiryModalProduct !== null && (
-          <EnquiryModal
-            onClose={() => setEnquiryModalProduct(null)}
-            initialProduct={enquiryModalProduct}
-          />
-        )}
       </main>
+
+      {/* Modal */}
+      {enquiryModalProduct && (
+        <EnquiryModal
+          onClose={() => setEnquiryModalProduct(null)}
+          initialProduct={enquiryModalProduct}
+        />
+      )}
     </Shell>
   );
 }
 
 // =============================================================================
-// PAGE 3: PRODUCT DETAIL PAGE
+// PAGE 3: PRODUCT DETAIL
 // =============================================================================
 function ProductDetail({ slug }: { slug: string }) {
-  const product = products.find((p) => p.slug === slug) ?? products[0];
   const [enquiryModalOpen, setEnquiryModalOpen] = useState(false);
+  const product = products.find((item) => item.slug === slug) ?? products[0];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   return (
     <Shell onEnquire={() => setEnquiryModalOpen(true)}>
-      <main className="min-h-screen pb-24">
-        {/* Top Breadcrumb Bar */}
-        <div className="mx-auto max-w-[1280px] px-5 pt-8 lg:px-8">
+      <main className="pb-20">
+        {/* Back Link */}
+        <div className="mx-auto max-w-[1240px] px-5 pt-8 lg:px-8">
           <Link
             href="/products"
-            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#079cd4] hover:text-[#38bdf8]"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6a8089] transition hover:text-[#079cd4]"
           >
-            <ChevronLeft size={16} /> Back to Products Catalog
+            <ChevronRight size={14} className="rotate-180" /> Back to All Products
           </Link>
         </div>
 
-        {/* Product Showcase Header */}
-        <section className="mx-auto mt-6 max-w-[1280px] px-5 lg:px-8">
-          <div className="grid items-center gap-12 rounded-3xl border border-white/10 bg-gradient-to-br from-[#0e2133] via-[#0b1b2a] to-[#07131e] p-8 shadow-2xl lg:grid-cols-[1.1fr_0.9fr] lg:p-14">
+        {/* Hero Product Spotlight */}
+        <section
+          className={`mx-auto mt-6 grid max-w-[1240px] overflow-hidden rounded-3xl border border-[#d8e7e6] bg-gradient-to-br ${product.accent} px-6 py-12 sm:px-12 lg:grid-cols-[1fr_1fr] lg:items-center lg:px-16 lg:py-16`}
+        >
+          {/* Left Details */}
+          <div className="order-2 lg:order-1">
+            <span className="rounded-full bg-white/90 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#079cd4] shadow-xs">
+              {product.category}
+            </span>
+            <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-[#14364b] sm:text-5xl lg:leading-[1.1]">
+              {product.name}
+            </h1>
+            <p className="mt-4 max-w-lg text-sm leading-7 text-[#506875] sm:text-base">
+              {product.description}
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button
+                onClick={() => setEnquiryModalOpen(true)}
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-[#14364b] px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#079cd4]"
+              >
+                Request Consultation <ArrowUpRight size={15} />
+              </button>
+              <a
+                href="tel:18002668800"
+                className="flex items-center gap-2 rounded-full border border-[#b5ced0] bg-white/80 px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-[#14364b] transition hover:bg-white"
+              >
+                <Phone size={14} className="text-[#079cd4]" /> Call 1800-266-8800
+              </a>
+            </div>
+          </div>
+
+          {/* Right Product Image */}
+          <div className="order-1 relative flex min-h-[300px] items-center justify-center lg:order-2 lg:min-h-[420px]">
+            <div className="absolute h-64 w-64 rounded-full bg-white/90 blur-3xl" />
+            <img
+              src={product.image}
+              alt={product.name}
+              className="product-float product-shadow relative z-10 max-h-[360px] w-auto max-w-[85%] object-contain"
+            />
+          </div>
+        </section>
+
+        {/* Specifications & Clinical Features */}
+        <section className="mx-auto max-w-[1240px] px-5 pt-16 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#079cd4]/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#38bdf8]">
-                  {product.category}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-xs font-bold text-white">
-                  {product.badge}
-                </span>
-              </div>
-
-              <h1 className="mt-4 font-display text-4xl font-extrabold text-white sm:text-5xl">
-                {product.name}
-              </h1>
-              <p className="mt-2 text-base font-semibold text-[#079cd4]">
-                {product.eyebrow}
+              <p className="eyebrow text-[#079cd4]">Engineering Specs</p>
+              <h2 className="mt-2 font-display text-3xl font-bold text-[#14364b]">
+                Clinical Specifications
+              </h2>
+              <p className="mt-4 text-xs leading-6 text-[#6a8089]">
+                Calibrated and manufactured according to international medical device directives (EN ISO 13485:2016, ISO 9001:2015, BIS, and CE).
               </p>
-
-              <p className="mt-5 text-sm leading-7 text-[#9cb4c5] sm:text-base">
-                {product.description}
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => setEnquiryModalOpen(true)}
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-[#079cd4] to-[#0284c7] px-8 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-xl shadow-[#079cd4]/25 transition hover:scale-105"
-                >
-                  Request Consultation <Send size={15} />
-                </button>
-
-                <a
-                  href="#specs"
-                  className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-white/10"
-                >
-                  Technical Specs <ChevronDown size={15} />
-                </a>
-              </div>
-
-              {/* Direct Helpline Badge */}
-              <div className="mt-8 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-[#8ea4b5]">
-                <Phone size={18} className="text-[#079cd4]" />
-                <div>
-                  <span>Direct Sales Helpline: </span>
-                  <strong className="text-white">0172 – 6618001</strong> /{' '}
-                  <strong className="text-[#079cd4]">1800-266-8800 (Toll Free)</strong>
-                </div>
-              </div>
             </div>
 
-            {/* Product Real Image Centerpiece */}
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-white/10 bg-[#061019] p-8">
-              <img
-                src={product.cleanImage}
-                alt={product.name}
-                className="max-h-[380px] w-auto max-w-full object-contain drop-shadow-[0_30px_35px_rgba(7,156,212,0.25)]"
-              />
-              <span className="mt-4 text-[.7rem] font-semibold text-[#668294]">
-                Genuine Allengers OEM System Photography
-              </span>
+            {/* Spec Cards */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {product.specs.map((spec, idx) => (
+                <div
+                  key={spec}
+                  className="rounded-xl border border-[#d8e7e6] bg-white p-5 shadow-xs"
+                >
+                  <span className="font-mono text-xs font-bold text-[#079cd4]">
+                    0{idx + 1}.
+                  </span>
+                  <p className="mt-2 text-xs font-bold leading-5 text-[#385365]">{spec}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Features Checklist */}
+          <div className="mt-14 rounded-2xl border border-[#d8e7e6] bg-white p-8 shadow-xs">
+            <h3 className="font-display text-xl font-bold text-[#14364b]">
+              Clinical Highlights & Benefits
+            </h3>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {product.features.map((feat) => (
+                <div key={feat} className="flex items-start gap-3">
+                  <Check size={16} className="mt-0.5 shrink-0 text-[#079cd4]" />
+                  <span className="text-xs leading-5 text-[#506875]">{feat}</span>
+                </div>
+              ))}
             </div>
           </div>
         </section>
-
-        {/* Specifications & Compliance Grid */}
-        <section id="specs" className="mx-auto mt-16 max-w-[1280px] px-5 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-            {/* Tech Specs */}
-            <div className="rounded-3xl border border-white/10 bg-[#091929] p-8 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#079cd4]/20 text-[#079cd4]">
-                  <FileText size={20} />
-                </div>
-                <h3 className="font-display text-2xl font-bold text-white">
-                  Technical Specifications
-                </h3>
-              </div>
-
-              <div className="mt-6 divide-y divide-white/5">
-                {product.specs.map((spec, i) => (
-                  <div key={spec} className="flex items-start gap-3 py-3 text-xs sm:text-sm text-[#9cb4c5]">
-                    <span className="font-mono text-xs font-bold text-[#079cd4]">
-                      {String(i + 1).padStart(2, '0')}.
-                    </span>
-                    <span>{spec}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Clinical Highlights */}
-            <div className="rounded-3xl border border-white/10 bg-[#091929] p-8 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#14b8a6]/20 text-[#14b8a6]">
-                  <ShieldCheck size={20} />
-                </div>
-                <h3 className="font-display text-2xl font-bold text-white">
-                  Clinical Highlights & Compliance
-                </h3>
-              </div>
-
-              <div className="mt-6 space-y-3">
-                {product.features.map((feat) => (
-                  <div key={feat} className="flex items-start gap-3 rounded-xl bg-white/5 p-3 text-xs sm:text-sm text-[#9cb4c5]">
-                    <Check size={16} className="mt-0.5 shrink-0 text-[#079cd4]" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Quality Guarantee Box */}
-              <div className="mt-8 rounded-2xl border border-white/10 bg-gradient-to-r from-[#079cd4]/20 via-[#079cd4]/5 to-transparent p-5">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#38bdf8]">
-                  <Award size={16} /> Certified Manufacturing Quality
-                </div>
-                <p className="mt-2 text-xs leading-5 text-[#8ea4b5]">
-                  Engineered and calibrated in strict compliance with <strong>ISO 9001:2015</strong>, <strong>EN ISO 13485:2016</strong>, <strong>BIS</strong>, and <strong>CE</strong> medical device directives.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {enquiryModalOpen && (
-          <EnquiryModal
-            onClose={() => setEnquiryModalOpen(false)}
-            initialProduct={product.name}
-          />
-        )}
       </main>
+
+      {/* Modal */}
+      {enquiryModalOpen && (
+        <EnquiryModal
+          onClose={() => setEnquiryModalOpen(false)}
+          initialProduct={product.name}
+        />
+      )}
     </Shell>
   );
 }
@@ -1810,12 +1513,12 @@ function ProductDetail({ slug }: { slug: string }) {
 function NotFound() {
   return (
     <Shell onEnquire={() => {}}>
-      <main className="flex min-h-[60vh] flex-col items-center justify-center px-5 text-center">
-        <h1 className="font-display text-6xl font-extrabold text-white">404</h1>
-        <p className="mt-2 text-sm text-[#8ea4b5]">Page Not Found</p>
+      <main className="mx-auto flex min-h-[60vh] max-w-[1240px] flex-col items-center justify-center px-5 text-center">
+        <h1 className="font-display text-6xl font-extrabold text-[#14364b]">404</h1>
+        <p className="mt-2 text-sm text-[#6a8089]">The requested page could not be found.</p>
         <Link
           href="/"
-          className="mt-6 rounded-full bg-[#079cd4] px-8 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#0284c7]"
+          className="mt-6 inline-block rounded-full bg-[#079cd4] px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#0284c7]"
         >
           Return to Home
         </Link>
@@ -1825,16 +1528,15 @@ function NotFound() {
 }
 
 // =============================================================================
-// ROUTER & APP ROOT
+// MAIN ROUTER
 // =============================================================================
 export default function App() {
-  const [, params] = useRoute('/products/:slug');
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/products" component={ProductsPage} />
       <Route path="/products/:slug">
-        {() => <ProductDetail slug={params?.slug ?? ''} />}
+        {(params) => <ProductDetail slug={params.slug} />}
       </Route>
       <Route component={NotFound} />
     </Switch>
