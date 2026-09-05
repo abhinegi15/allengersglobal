@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Medical Products Website"
+description = "A polished three-page React website sample for a medical equipment company, with a home page, product catalog, and product detail view inspired by the provided references."
+version = "1.0.0"
+id = "artifacts/medical-products-website"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20662
+
+[services.development]
+run = "pnpm --filter @workspace/medical-products-website run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/medical-products-website", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/medical-products-website/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20662"
+BASE_PATH = "/"
