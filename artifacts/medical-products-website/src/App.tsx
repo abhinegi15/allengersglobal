@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Route, Switch, useLocation } from 'wouter';
 import {
   Activity,
@@ -7,18 +7,15 @@ import {
   Award,
   BadgeCheck,
   Check,
+  ChevronLeft,
   ChevronRight,
   Clock,
-  Compass,
-  Cpu,
-  FileText,
-  Flame,
   Globe2,
   HeartPulse,
-  Layers,
   Mail,
   MapPin,
   Menu,
+  Pause,
   Phone,
   Play,
   Search,
@@ -56,7 +53,7 @@ export const products: Product[] = [
     category: 'Urology',
     eyebrow: 'Lithotripsy & HoLEP Platform',
     description:
-      'High-precision holmium laser system with super-imposed modulated pulse shaping to minimize stone retropulsion and accelerate stone ablation efficiency.',
+      'High-precision holmium laser system with super-imposed modulated pulse shaping to minimize stone retropulsion and maximize stone ablation efficiency.',
     image: '/products/blaze-prime-holmium-laser-clean.png',
     accent: 'from-[#dceaf8] via-[#eff5fa] to-[#f7fbfa]',
     badge: 'Urology Flagship',
@@ -798,7 +795,7 @@ function Shell({
 }
 
 // =============================================================================
-// INTERACTIVE ENHANCED PRODUCT CARD (With In-Card Specs Tabbing!)
+// ENHANCED PRODUCT CARD (With In-Card Specs Tabbing)
 // =============================================================================
 function EnhancedProductCard({
   product,
@@ -816,9 +813,6 @@ function EnhancedProductCard({
         {/* Soft Radiant Halo */}
         <div className="absolute h-48 w-48 rounded-full bg-white/70 blur-2xl transition duration-700 group-hover:scale-125" />
         <div className="absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-[#079cd4]/10 blur-xl" />
-
-        {/* Concentric Decorative Ring */}
-        <div className="pointer-events-none absolute h-52 w-52 rounded-full border border-white/60" />
 
         <img
           src={product.image}
@@ -935,337 +929,357 @@ function EnhancedProductCard({
 }
 
 // =============================================================================
-// PAGE 1: HOME PAGE (Ultra-Modern Interactive Medical Holodeck Hero)
+// HERO CAROUSEL SLIDES DEFINITION (5 Signature Hospital Systems)
 // =============================================================================
-function Home() {
-  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
-  const [enquiryModalProduct, setEnquiryModalProduct] = useState<string | null>(null);
+const carouselSlides = [
+  {
+    slug: 'blaze-prime',
+    shortTitle: 'BLAZE-prime',
+    title: 'BLAZE-prime Holmium Laser Platform',
+    category: 'Urology Intervention',
+    tagline: 'Super-Imposed Pulse Modulation for Superior Stone Fragmentation & HoLEP',
+    description:
+      'Engineered with advanced pulse shaping technology to minimize retropulsion, maximize surgical precision, and reduce operative time in challenging endourology procedures.',
+    image: '/products/blaze-prime-holmium-laser-clean.png',
+    accentBg: 'from-[#eaf4fc] via-[#f1f7fd] to-[#f7fbfa]',
+    accentColor: '#079cd4',
+    badge: 'Flagship Holmium Laser',
+    specs: ['Up to 100W Output Power', '0.1 J – 5.0 J Pulse Energy', 'Dual Inverter Turbo Cooling', '12” Swivel Touchscreen'],
+  },
+  {
+    slug: 'fiberlaze-plus',
+    shortTitle: 'FiberLAZE+',
+    title: 'FiberLAZE+ Thulium Fiber Laser',
+    category: 'Endoscopic Surgery',
+    tagline: 'Extreme 2500 Hz High-Frequency Dusting with Hybrid Air Cooling',
+    description:
+      'Delivers sub-millimeter stone dust for spontaneous natural passage and bloodless soft tissue resection with ultra-shallow (<0.2 mm) penetration depth.',
+    image: '/products/fiberlaze-thulium-laser-clean.png',
+    accentBg: 'from-[#e5f6f8] via-[#eef9fa] to-[#f7fbfa]',
+    accentColor: '#00b4d8',
+    badge: 'High Frequency Laser',
+    specs: ['Up to 2500 Hz Pulse Rate', 'Hybrid Air-Cooled System', 'Minimal Tissue Carbonization', 'Single-Phase 220V Power'],
+  },
+  {
+    slug: 'neuroplot',
+    shortTitle: 'VIRGO EEG',
+    title: 'Neuroplot / VIRGO EEG System',
+    category: 'Neuro Diagnostics',
+    tagline: '32-Channel DSP Brain Wave Mapping & Clinical Seizure Localization',
+    description:
+      'Hospital-grade clinical electroencephalograph station with synchronized HD video, automated artifact rejection, and pre-configured pediatric and adult ICU montages.',
+    image: '/products/virgo-electroencephalograph-clean.png',
+    accentBg: 'from-[#f4f0fd] via-[#f9f7fe] to-[#f7fbfa]',
+    accentColor: '#6366f1',
+    badge: 'Neurology Flagship',
+    specs: ['32 / 24 Channel DSP Headbox', 'Spectral Brain Mapping', 'Full HD Medical Display', 'Universal EDF / PDF Export'],
+  },
+  {
+    slug: 'gemini-treadmill',
+    shortTitle: 'Gemini TMT',
+    title: 'Gemini TMT Cardiac Stress System',
+    category: 'Cardiology Diagnostics',
+    tagline: 'Heavy-Duty 20 km/h Treadmill Stress Test with Stable Baseline Filter',
+    description:
+      'Over 30 years of manufacturing excellence: GEMINI-A-DX AC drive, 12-lead simultaneous stress ECG recording, and standard Bruce stress protocols.',
+    image: '/products/gemini-treadmill-tmt-clean.png',
+    accentBg: 'from-[#ebf7f0] via-[#f3faf5] to-[#f7fbfa]',
+    accentColor: '#10b981',
+    badge: 'Cardiology Classic',
+    specs: ['20 km/h AC High-Torque Drive', '0% to 22% Grade Elevation', '12-Lead Real-time Stress ECG', '200 kg Patient Deck Rating'],
+  },
+  {
+    slug: 'libra-mpm',
+    shortTitle: 'LIBRA MPM',
+    title: 'Libra Smart / BRIO Multipara Monitor',
+    category: 'Patient Monitoring',
+    tagline: '15.6” Anti-Glare Touchscreen with 120 Hours Continuous Trend Storage',
+    description:
+      'Clinical-grade bedside vital signs monitoring delivering 8 real-time waveforms, 360° visual alarm beacon, and Central Nursing Station (CNS) wired & wireless telemetry.',
+    image: '/products/libra-multipara-monitor-clean.png',
+    accentBg: 'from-[#e6f6f4] via-[#f0faf8] to-[#f7fbfa]',
+    accentColor: '#14b8a6',
+    badge: 'Critical Care Monitoring',
+    specs: ['15.6” High-Brightness Display', '8 Real-time Waveforms', '120 Hours Graphical Trends', 'Central Station Networking'],
+  },
+];
 
-  // 5 Signature Hero Modalities with Interactive HUD Hotspots
-  const heroSystems = [
-    {
-      slug: 'blaze-prime',
-      label: 'BLAZE-prime',
-      fullName: 'BLAZE-prime Holmium Laser',
-      category: 'Urology',
-      tagline: 'High-Energy Precision Lithotripsy & HoLEP Platform',
-      highlightBadge: 'Up to 100W Output Power',
-      image: '/products/blaze-prime-holmium-laser-clean.png',
-      accentGlow: 'from-[#079cd4]/20 via-[#38bdf8]/10 to-transparent',
-      hudHotspots: [
-        { label: 'Pulse Modulation', desc: 'Minimizes stone retropulsion', pos: 'top-left' },
-        { label: '100W / 65W / 30W', desc: '0.1J – 5.0J Energy Range', pos: 'top-right' },
-        { label: 'Dual Inverter Cooling', desc: 'Continuous OR duty cycle', pos: 'bottom-left' },
-        { label: '12” Swivel Touchscreen', desc: 'Surgeon-first ergonomic console', pos: 'bottom-right' },
-      ],
-      metrics: [
-        { label: 'Max Pulse Rate', value: '80 Hz' },
-        { label: 'Pulse Energy', value: '5.0 Joules' },
-        { label: 'Laser Source', value: 'Ho:YAG 2.1µm' },
-      ],
-    },
-    {
-      slug: 'fiberlaze-plus',
-      label: 'FiberLAZE+',
-      fullName: 'FiberLAZE+ Thulium Laser',
-      category: 'Urology',
-      tagline: 'Extreme-Frequency 2500 Hz Thulium Dusting & Soft Tissue Resection',
-      highlightBadge: 'Ultra-Fine Dusting & Tissue Surgery',
-      image: '/products/fiberlaze-thulium-laser-clean.png',
-      accentGlow: 'from-[#00b4d8]/20 via-[#079cd4]/10 to-transparent',
-      hudHotspots: [
-        { label: '2500 Hz Extreme Rate', desc: 'Sub-millimeter dust formation', pos: 'top-left' },
-        { label: 'Hybrid Air Cooling', desc: 'Water-refill free operation', pos: 'top-right' },
-        { label: '<0.2 mm Penetration', desc: 'Bloodless soft tissue vaporization', pos: 'bottom-left' },
-        { label: 'Hands-free Dual Pedal', desc: 'Instant Ready / Standby toggle', pos: 'bottom-right' },
-      ],
-      metrics: [
-        { label: 'Max Frequency', value: '2500 Hz' },
-        { label: 'Cooling Type', value: 'Hybrid Air' },
-        { label: 'Power Input', value: '220V 1-Phase' },
-      ],
-    },
-    {
-      slug: 'neuroplot',
-      label: 'VIRGO EEG',
-      fullName: 'Neuroplot / VIRGO EEG',
-      category: 'Neurology',
-      tagline: 'State-of-the-Art 32-Channel Brain Mapping & Seizure Localization',
-      highlightBadge: 'Digital Signal Processing Headbox',
-      image: '/products/virgo-electroencephalograph-clean.png',
-      accentGlow: 'from-[#6366f1]/20 via-[#3b82f6]/10 to-transparent',
-      hudHotspots: [
-        { label: '32-Channel DSP', desc: 'Ultra-low-noise headbox', pos: 'top-left' },
-        { label: 'Spectral Brain Mapping', desc: 'Frequency & montage analysis', pos: 'top-right' },
-        { label: 'Synchronized HD Video', desc: 'Clinical correlation recording', pos: 'bottom-left' },
-        { label: 'Universal EDF Export', desc: 'PACS & Hospital EMR integration', pos: 'bottom-right' },
-      ],
-      metrics: [
-        { label: 'Channels', value: '32 / 24 Ch' },
-        { label: 'Display', value: 'Full HD Medical' },
-        { label: 'Compliance', value: 'Clinical Neuro' },
-      ],
-    },
-    {
-      slug: 'gemini-treadmill',
-      label: 'Gemini TMT',
-      fullName: 'Gemini TMT Machine (GEMINI-A-DX)',
-      category: 'Cardiology',
-      tagline: 'Rugged Cardiac Stress Test Station with Digital Baseline Stabilization',
-      highlightBadge: 'Heavy-Duty 20 km/h AC Motor',
-      image: '/products/gemini-treadmill-tmt-clean.png',
-      accentGlow: 'from-[#10b981]/20 via-[#059669]/10 to-transparent',
-      hudHotspots: [
-        { label: '20 km/h AC Drive', desc: '0–22% Grade Elevation', pos: 'top-left' },
-        { label: 'Stable Baseline Filter', desc: 'No drift during high cadence', pos: 'top-right' },
-        { label: '12-Lead Real-time ECG', desc: 'Bruce & Custom Protocols', pos: 'bottom-left' },
-        { label: '200 kg Deck Capacity', desc: 'Reinforced patient platform', pos: 'bottom-right' },
-      ],
-      metrics: [
-        { label: 'Max Speed', value: '20 km/h' },
-        { label: 'Max Elevation', value: '22%' },
-        { label: 'Leads', value: '12-Lead Stress' },
-      ],
-    },
-    {
-      slug: 'libra-mpm',
-      label: 'LIBRA MPM',
-      fullName: 'Libra Smart / BRIO MPM',
-      category: 'Patient Monitoring',
-      tagline: 'Hospital Bedside Care with 15.6” Touchscreen & 120h Continuous Trends',
-      highlightBadge: 'Critical Care Monitoring',
-      image: '/products/libra-multipara-monitor-clean.png',
-      accentGlow: 'from-[#14b8a6]/20 via-[#06b6d4]/10 to-transparent',
-      hudHotspots: [
-        { label: '15.6” Anti-Glare Display', desc: '8 high-contrast waveforms', pos: 'top-left' },
-        { label: '120h Continuous Trends', desc: 'Tabular & graphical memory', pos: 'top-right' },
-        { label: '360° Visual Alarm Light', desc: 'Immediate caregiver alert', pos: 'bottom-left' },
-        { label: 'CNS Wired & Wireless', desc: 'Central nursing station telemetry', pos: 'bottom-right' },
-      ],
-      metrics: [
-        { label: 'Screen Size', value: '15.6” High-Res' },
-        { label: 'Waveforms', value: 'Up to 8 Leads' },
-        { label: 'Battery', value: 'Li-Ion Backup' },
-      ],
-    },
-  ];
+// =============================================================================
+// HERO BANNER CAROUSEL COMPONENT (User Requested)
+// =============================================================================
+function HeroBannerCarousel({ onEnquire }: { onEnquire: (productName?: string) => void }) {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const currentHero = heroSystems[activeHeroIndex];
+  // Auto-advance slides every 6 seconds unless paused
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const slide = carouselSlides[currentSlide];
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? carouselSlides.length - 1 : prev - 1));
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+  };
 
   return (
-    <Shell onEnquire={(p) => setEnquiryModalProduct(p || products[0].name)}>
-      <main>
-        {/* ============================================================== */}
-        {/* INNOVATIVE INTERACTIVE HERO: THE MEDICAL HOLODECK STAGE        */}
-        {/* ============================================================== */}
-        <section className="relative overflow-hidden border-b border-[#d8e7e6] bg-gradient-to-b from-[#eef7f6] via-[#f5faf9] to-[#f7fbfa] py-12 lg:py-16">
-          {/* Subtle Medical Grid */}
-          <div className="site-grid absolute inset-0 opacity-75 pointer-events-none" />
+    <section
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="relative overflow-hidden border-b border-[#d8e7e6] bg-[#f7fbfa]"
+    >
+      {/* Dynamic Slide Background */}
+      <div
+        className={`relative transition-all duration-700 bg-gradient-to-br ${slide.accentBg} py-14 lg:py-20`}
+      >
+        {/* Subtle Background Medical Grid */}
+        <div className="site-grid absolute inset-0 opacity-60 pointer-events-none" />
 
-          <div className="relative mx-auto max-w-[1280px] px-5 lg:px-8">
-            {/* Top Status Header */}
-            <div className="flex flex-col items-center justify-center text-center">
-              <div className="inline-flex items-center gap-2.5 rounded-full border border-[#079cd4]/30 bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#079cd4] shadow-xs backdrop-blur-md">
-                <span className="h-2 w-2 rounded-full bg-[#10b981] pulse-dot" />
-                Allengers Global Healthcare • ISO 13485:2016 & CE Certified
+        {/* Ambient Halo Behind Image */}
+        <div className="pointer-events-none absolute right-1/4 top-1/2 -translate-y-1/2 h-[450px] w-[450px] rounded-full bg-white/70 blur-3xl" />
+
+        <div className="relative mx-auto max-w-[1280px] px-5 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] min-h-[480px]">
+            {/* Left Content Column */}
+            <div className="z-20 max-w-2xl">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#079cd4]/30 bg-white/90 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-[#079cd4] shadow-xs backdrop-blur-md">
+                <Sparkles size={14} className="text-[#f6b95c]" />
+                <span>{slide.badge}</span>
+                <span className="text-[#c4d7de]">•</span>
+                <span className="text-[#5b707d]">{slide.category}</span>
               </div>
 
-              <h1 className="mt-4 max-w-4xl font-display text-4xl font-extrabold tracking-tight text-[#14364b] sm:text-5xl lg:text-6xl">
-                Advanced Diagnostic & Surgical Systems
+              {/* Title & Tagline */}
+              <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-[#14364b] sm:text-5xl lg:text-6xl lg:leading-[1.08]">
+                {slide.title}
               </h1>
 
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#506875] sm:text-base">
-                Engineered for High-Acuity Precision in Urology, Cardiology, Neurology, and Patient Monitoring.
+              <p className="mt-4 font-display text-base font-semibold text-[#079cd4] sm:text-lg">
+                {slide.tagline}
               </p>
-            </div>
 
-            {/* ============================================================ */}
-            {/* THE 3D HOLOGRAPHIC EQUIPMENT STAGE                           */}
-            {/* ============================================================ */}
-            <div className="relative mx-auto mt-8 max-w-5xl">
-              {/* Background Circular Rotating HUD Rings */}
-              <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
-                {/* Dynamic Radial Aura */}
-                <div className={`h-[380px] w-[380px] sm:h-[480px] sm:w-[480px] rounded-full bg-gradient-to-tr ${currentHero.accentGlow} blur-3xl transition-all duration-700`} />
-                {/* Rotating Dashed Outer Ring */}
-                <div className="absolute h-[340px] w-[340px] sm:h-[440px] sm:w-[440px] rounded-full border border-dashed border-[#079cd4]/25 hud-spin" />
-                {/* Counter Rotating Inner Ring */}
-                <div className="absolute h-[280px] w-[280px] sm:h-[360px] sm:w-[360px] rounded-full border border-[#079cd4]/15 hud-spin-reverse" />
-              </div>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-[#506875]">
+                {slide.description}
+              </p>
 
-              {/* Central Equipment Image Container */}
-              <div className="relative flex min-h-[380px] sm:min-h-[440px] items-center justify-center">
-                <img
-                  key={currentHero.slug}
-                  src={currentHero.image}
-                  alt={currentHero.fullName}
-                  className="product-float product-shadow-3d relative z-20 max-h-[320px] sm:max-h-[380px] w-auto max-w-[80%] object-contain transition-all duration-500"
-                />
-
-                {/* Ground Shadow Ellipse */}
-                <div className="absolute bottom-4 h-6 w-[55%] rounded-[50%] bg-[#376b75]/20 blur-xl z-10" />
-
-                {/* 4 Interactive Floating HUD Hotspots (Surrounding the Centerpiece) */}
-                {/* Hotspot 1: Top-Left */}
-                <div className="absolute left-2 top-6 z-30 hidden sm:block">
-                  <div className="rounded-2xl border border-white/90 bg-white/90 p-3.5 shadow-lg backdrop-blur-md transition duration-300 hover:scale-105 hover:border-[#079cd4]">
-                    <div className="flex items-center gap-2 text-[#079cd4]">
-                      <Sparkles size={14} className="text-[#079cd4]" />
-                      <span className="font-display text-xs font-bold text-[#14364b]">
-                        {currentHero.hudHotspots[0].label}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[.7rem] text-[#6a8089]">
-                      {currentHero.hudHotspots[0].desc}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Hotspot 2: Top-Right */}
-                <div className="absolute right-2 top-6 z-30 hidden sm:block">
-                  <div className="rounded-2xl border border-white/90 bg-white/90 p-3.5 shadow-lg backdrop-blur-md transition duration-300 hover:scale-105 hover:border-[#079cd4]">
-                    <div className="flex items-center gap-2 text-[#079cd4]">
-                      <Zap size={14} className="text-[#079cd4]" />
-                      <span className="font-display text-xs font-bold text-[#14364b]">
-                        {currentHero.hudHotspots[1].label}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[.7rem] text-[#6a8089]">
-                      {currentHero.hudHotspots[1].desc}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Hotspot 3: Bottom-Left */}
-                <div className="absolute bottom-12 left-2 z-30 hidden sm:block">
-                  <div className="rounded-2xl border border-white/90 bg-white/90 p-3.5 shadow-lg backdrop-blur-md transition duration-300 hover:scale-105 hover:border-[#079cd4]">
-                    <div className="flex items-center gap-2 text-[#079cd4]">
-                      <ShieldCheck size={14} className="text-[#079cd4]" />
-                      <span className="font-display text-xs font-bold text-[#14364b]">
-                        {currentHero.hudHotspots[2].label}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[.7rem] text-[#6a8089]">
-                      {currentHero.hudHotspots[2].desc}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Hotspot 4: Bottom-Right */}
-                <div className="absolute bottom-12 right-2 z-30 hidden sm:block">
-                  <div className="rounded-2xl border border-white/90 bg-white/90 p-3.5 shadow-lg backdrop-blur-md transition duration-300 hover:scale-105 hover:border-[#079cd4]">
-                    <div className="flex items-center gap-2 text-[#079cd4]">
-                      <Cpu size={14} className="text-[#079cd4]" />
-                      <span className="font-display text-xs font-bold text-[#14364b]">
-                        {currentHero.hudHotspots[3].label}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[.7rem] text-[#6a8089]">
-                      {currentHero.hudHotspots[3].desc}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Spec Quick Bar */}
-              <div className="relative z-30 mx-auto -mt-4 max-w-xl rounded-2xl border border-[#d8e7e6] bg-white/95 p-4 shadow-md backdrop-blur-md">
-                <div className="grid grid-cols-3 divide-x divide-[#edf5f3] text-center">
-                  {currentHero.metrics.map((m) => (
-                    <div key={m.label} className="px-2">
-                      <p className="text-[.65rem] font-bold uppercase tracking-wider text-[#8ba2b0]">
-                        {m.label}
-                      </p>
-                      <p className="mt-1 font-display text-sm font-extrabold text-[#14364b] sm:text-base">
-                        {m.value}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Interactive Modality Switcher Dock */}
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                {heroSystems.map((item, index) => (
-                  <button
-                    key={item.slug}
-                    onClick={() => setActiveHeroIndex(index)}
-                    className={`cursor-pointer flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition duration-200 ${
-                      activeHeroIndex === index
-                        ? 'bg-[#14364b] text-white shadow-md scale-105'
-                        : 'bg-white text-[#506875] border border-[#d8e7e6] hover:bg-[#edf6f5] hover:text-[#14364b]'
-                    }`}
+              {/* Specs Pills */}
+              <div className="mt-6 flex flex-wrap gap-2">
+                {slide.specs.map((spec) => (
+                  <span
+                    key={spec}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8e7e6] bg-white/95 px-3 py-1.5 text-xs font-bold text-[#385365] shadow-xs"
                   >
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        activeHeroIndex === index ? 'bg-[#079cd4]' : 'bg-[#a3bac6]'
-                      }`}
-                    />
-                    <span>{item.label}</span>
-                  </button>
+                    <Check size={14} className="text-[#079cd4]" />
+                    {spec}
+                  </span>
                 ))}
               </div>
 
-              {/* Direct Action Buttons */}
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+              {/* CTA Row */}
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
-                  href={`/products/${currentHero.slug}`}
-                  className="flex items-center gap-2 rounded-full bg-[#079cd4] px-7 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:bg-[#0284c7] hover:scale-105"
+                  href={`/products/${slide.slug}`}
+                  className="flex items-center gap-2 rounded-full bg-[#14364b] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-white shadow-md transition duration-200 hover:bg-[#079cd4] hover:shadow-lg hover:scale-105"
                 >
-                  Explore {currentHero.label} Specs <ArrowRight size={15} />
+                  Explore Specifications <ArrowRight size={15} />
                 </Link>
 
                 <button
-                  onClick={() => setEnquiryModalProduct(currentHero.fullName)}
-                  className="cursor-pointer flex items-center gap-2 rounded-full border border-[#14364b] bg-white px-7 py-3 text-xs font-bold uppercase tracking-wider text-[#14364b] transition hover:bg-[#14364b] hover:text-white"
+                  onClick={() => onEnquire(slide.title)}
+                  className="cursor-pointer flex items-center gap-2 rounded-full border-2 border-[#079cd4] bg-white px-7 py-3 text-xs font-bold uppercase tracking-wider text-[#079cd4] shadow-xs transition duration-200 hover:bg-[#079cd4] hover:text-white"
                 >
                   Request Official Quote
                 </button>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* ============================================================== */}
-        {/* ANIMATED TICKER RIBBON                                         */}
-        {/* ============================================================== */}
-        <section className="overflow-hidden border-b border-[#d8e7e6] bg-white py-4 shadow-xs">
-          <div className="flex w-max items-center gap-8 marquee">
-            {[
-              'EN ISO 13485:2016 Certified Quality',
-              'CE Marking Medical Directives Compliant',
-              'BIS (Bureau of Indian Standards) Approved',
-              '7,000+ Global Hospital Clients',
-              '12,000+ Active Equipment Installations',
-              'Exported to 36+ Nations Worldwide',
-              '24/7 Biomedical Helpline: 1800-266-8800',
-              'Headquartered in Chandigarh, India since 2009',
-            ].map((text, i) => (
-              <div key={i} className="flex items-center gap-3 text-xs font-bold text-[#506875]">
-                <BadgeCheck size={16} className="text-[#079cd4]" />
-                <span>{text}</span>
-                <span className="text-[#c4d7de]">•</span>
+            {/* Right Product Image Column */}
+            <div className="relative flex min-h-[340px] items-center justify-center lg:min-h-[460px]">
+              {/* Concentric Rotating Ring */}
+              <div className="pointer-events-none absolute h-[320px] w-[320px] sm:h-[400px] sm:w-[400px] rounded-full border border-dashed border-[#079cd4]/20 hud-spin" />
+
+              {/* Floating Equipment Image */}
+              <img
+                key={slide.slug}
+                src={slide.image}
+                alt={slide.title}
+                className="product-float product-shadow relative z-20 max-h-[340px] sm:max-h-[420px] w-auto max-w-[85%] object-contain"
+              />
+
+              {/* Ground Reflection Shadow */}
+              <div className="absolute bottom-4 h-7 w-[65%] rounded-[50%] bg-[#376b75]/20 blur-xl z-10" />
+
+              {/* Verified Quality Floating Badge */}
+              <div className="absolute right-2 top-6 z-30 rounded-2xl border border-white bg-white/95 p-3.5 shadow-lg backdrop-blur-md">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <BadgeCheck size={16} />
+                  <span className="text-xs font-bold text-[#14364b]">Certified Quality</span>
+                </div>
+                <p className="mt-0.5 text-[.7rem] text-[#6a8089]">
+                  ISO 13485:2016 & CE Approved
+                </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* CAROUSEL NAVIGATION CONTROLS & THUMBNAILS                      */}
+      {/* ============================================================== */}
+      <div className="border-t border-[#d8e7e6] bg-white/95 px-5 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-[1280px] flex-col items-center justify-between gap-4 md:flex-row lg:px-8">
+          {/* Arrow Buttons & Slide Counter */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={prevSlide}
+              aria-label="Previous Slide"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#d8e7e6] bg-white text-[#14364b] shadow-xs transition hover:bg-[#079cd4] hover:border-[#079cd4] hover:text-white"
+            >
+              <ChevronLeft size={20} />
+            </button>
+
+            <span className="font-mono text-xs font-bold text-[#506875]">
+              0{currentSlide + 1} / 0{carouselSlides.length}
+            </span>
+
+            <button
+              onClick={nextSlide}
+              aria-label="Next Slide"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-[#d8e7e6] bg-white text-[#14364b] shadow-xs transition hover:bg-[#079cd4] hover:border-[#079cd4] hover:text-white"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          {/* Slide Selector Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {carouselSlides.map((item, index) => (
+              <button
+                key={item.slug}
+                onClick={() => setCurrentSlide(index)}
+                className={`cursor-pointer flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition duration-200 ${
+                  currentSlide === index
+                    ? 'bg-[#14364b] text-white shadow-md scale-105'
+                    : 'bg-[#edf5f3] text-[#506875] hover:bg-[#d8e7e6]'
+                }`}
+              >
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    currentSlide === index ? 'bg-[#079cd4]' : 'bg-[#98b2bd]'
+                  }`}
+                />
+                <span>{item.shortTitle}</span>
+              </button>
             ))}
           </div>
+
+          {/* Auto-Slide Indicator */}
+          <div className="hidden items-center gap-2 text-[.7rem] text-[#8ba2b0] lg:flex">
+            <span>{isPaused ? 'Paused (Hover)' : 'Auto-advancing'}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// PAGE 1: HOME PAGE
+// =============================================================================
+function Home() {
+  const [enquiryModalProduct, setEnquiryModalProduct] = useState<string | null>(null);
+
+  return (
+    <Shell onEnquire={(p) => setEnquiryModalProduct(p || products[0].name)}>
+      <main>
+        {/* ============================================================== */}
+        {/* 1. HERO BANNER CAROUSEL (User Requested)                       */}
+        {/* ============================================================== */}
+        <HeroBannerCarousel onEnquire={(name) => setEnquiryModalProduct(name || '')} />
+
+        {/* ============================================================== */}
+        {/* 2. STATS & CREDENTIALS BAR                                     */}
+        {/* ============================================================== */}
+        <section className="border-b border-[#d8e7e6] bg-white py-10">
+          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <Globe2 size={22} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    7,000+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Clients Served Globally
+                </p>
+              </div>
+
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <Activity size={22} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    12,000+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Equipment Installations
+                </p>
+              </div>
+
+              <div className="border-r border-[#edf5f3] pr-4 last:border-none">
+                <div className="flex items-center gap-2 text-[#079cd4]">
+                  <ShieldCheck size={22} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    36+
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Export Countries
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2 text-[#e33136]">
+                  <Award size={22} />
+                  <span className="font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
+                    ISO & CE
+                  </span>
+                </div>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#5b707d]">
+                  Certified Medical Quality
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* ============================================================== */}
-        {/* ASYMMETRICAL BENTO GRID: CLINICAL SPECIALTIES MATRIX           */}
+        {/* 3. CLINICAL SPECIALTIES MATRIX (Bento Showcase)                */}
         {/* ============================================================== */}
         <section id="specialties" className="mx-auto max-w-[1280px] px-5 py-20 lg:px-8 lg:py-24">
           <div className="text-center">
-            <p className="eyebrow text-[#079cd4]">Multidisciplinary Portfolio</p>
+            <p className="eyebrow text-[#079cd4]">Specialized Healthcare Divisions</p>
             <h2 className="mt-2 font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
-              Specialized Platforms for Every Department
+              Engineered for Clinical Acuity
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#506875]">
-              Explore our core medical divisions engineered with hospital-grade durability, intuitive clinician controls, and verified international safety standards.
+              Designed around the practical realities of modern hospitals: clear controls, dependable performance, and zero compromise on patient safety.
             </p>
           </div>
 
-          {/* Bento Grid */}
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {/* Bento Card 1: Urology Suite (Large 2-Col Span) */}
+            {/* Urology Hub (2 Cols) */}
             <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#d8e7e6] bg-gradient-to-br from-[#eaf4fc] via-[#f2f8fd] to-white p-8 shadow-xs transition duration-300 hover:shadow-xl md:col-span-2">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="max-w-md">
@@ -1276,7 +1290,7 @@ function Home() {
                     Laser Lithotripsy & Soft Tissue Surgery
                   </h3>
                   <p className="mt-2 text-xs leading-6 text-[#506875]">
-                    Comprehensive dual platform: <strong>BLAZE-prime Holmium (100W/65W/30W)</strong> with super-imposed pulse modulation and <strong>FiberLAZE+ Thulium (2500 Hz)</strong> with hybrid air cooling.
+                    Comprehensive dual laser platform: <strong>BLAZE-prime Holmium (100W/65W/30W)</strong> with super-imposed pulse modulation and <strong>FiberLAZE+ Thulium (2500 Hz)</strong> with hybrid air cooling.
                   </p>
 
                   <div className="mt-6 grid grid-cols-2 gap-3 text-xs">
@@ -1286,7 +1300,7 @@ function Home() {
                     </div>
                     <div className="rounded-xl border border-white/80 bg-white/80 p-3 shadow-xs">
                       <p className="font-bold text-[#14364b]">Ultra-Fine Dusting</p>
-                      <p className="text-[.7rem] text-[#6a8089]">Spontaneous stone passage</p>
+                      <p className="text-[.7rem] text-[#6a8089]">Spontaneous stone clearance</p>
                     </div>
                   </div>
                 </div>
@@ -1303,18 +1317,18 @@ function Home() {
 
               <div className="mt-8 flex flex-wrap items-center justify-between border-t border-[#d8e7e6]/60 pt-4">
                 <span className="text-xs font-semibold text-[#8ba2b0]">
-                  Applicable: URS, PCNL, HoLEP, ThuLEP
+                  Procedures: URS, PCNL, HoLEP, ThuLEP
                 </span>
                 <Link
                   href="/products/blaze-prime"
                   className="flex items-center gap-1.5 text-xs font-bold text-[#079cd4] hover:underline"
                 >
-                  Explore Urology Systems <ArrowRight size={14} />
+                  Explore Urology Lasers <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
-            {/* Bento Card 2: Neurology Diagnostics (1-Col Span) */}
+            {/* Neurology Hub (1 Col) */}
             <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#d8e7e6] bg-gradient-to-br from-[#f6f2fc] via-[#fbf9fe] to-white p-8 shadow-xs transition duration-300 hover:shadow-xl">
               <div>
                 <span className="rounded-full bg-[#6366f1]/15 px-3 py-1 text-[.65rem] font-bold uppercase tracking-wider text-[#6366f1]">
@@ -1324,7 +1338,7 @@ function Home() {
                   VIRGO EEG & SCORPIO EMG
                 </h3>
                 <p className="mt-2 text-xs leading-5 text-[#506875]">
-                  High-fidelity 32-channel DSP brain mapping, nerve conduction velocity, and evoked potential analysis.
+                  High-fidelity 32-channel DSP brain wave mapping, nerve conduction velocity, and evoked potential analysis.
                 </p>
 
                 <div className="relative mt-6 flex min-h-[160px] items-center justify-center">
@@ -1342,13 +1356,13 @@ function Home() {
                   href="/products/neuroplot"
                   className="flex items-center justify-between text-xs font-bold text-[#6366f1] hover:underline"
                 >
-                  <span>Brain & Nerve Systems</span>
+                  <span>Neuro Systems</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
             </div>
 
-            {/* Bento Card 3: Cardiology Stress Suite (1-Col Span) */}
+            {/* Cardiology Hub (1 Col) */}
             <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#d8e7e6] bg-gradient-to-br from-[#eef8f2] via-[#f7fcf9] to-white p-8 shadow-xs transition duration-300 hover:shadow-xl">
               <div>
                 <span className="rounded-full bg-[#10b981]/15 px-3 py-1 text-[.65rem] font-bold uppercase tracking-wider text-[#10b981]">
@@ -1358,7 +1372,7 @@ function Home() {
                   Gemini TMT & Pisces ECG
                 </h3>
                 <p className="mt-2 text-xs leading-5 text-[#506875]">
-                  Rugged 20 km/h treadmill stress test platform with digital baseline stabilization, 12-channel diagnostic ECG, and ambulatory Holter.
+                  Heavy-duty 20 km/h treadmill stress test station with stable digital baseline, 12-lead ECG, and ambulatory Holter.
                 </p>
 
                 <div className="relative mt-6 flex min-h-[160px] items-center justify-center">
@@ -1382,7 +1396,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Bento Card 4: Patient Monitoring & Acute Care (Large 2-Col Span) */}
+            {/* Acute Care Hub (2 Cols) */}
             <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#d8e7e6] bg-gradient-to-br from-[#e8f7f5] via-[#f2faf9] to-white p-8 shadow-xs transition duration-300 hover:shadow-xl md:col-span-2">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
                 <div className="max-w-md">
@@ -1434,21 +1448,21 @@ function Home() {
         </section>
 
         {/* ============================================================== */}
-        {/* YOUTUBE EMBEDDED CORPORATE VIDEO THEATER                       */}
+        {/* 4. YOUTUBE CORPORATE DOCUMENTARY THEATER                       */}
         {/* ============================================================== */}
         <section id="video" className="border-y border-[#d8e7e6] bg-[#edf6f7] py-20 lg:py-24">
           <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
             <div className="text-center">
               <span className="eyebrow text-[#079cd4]">Engineering Excellence In Motion</span>
               <h2 className="mt-2 font-display text-3xl font-extrabold text-[#14364b] sm:text-4xl">
-                Allengers Milestones — Corporate Documentary
+                Allengers Milestones — Corporate Journey
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#506875]">
-                Take a virtual tour of our state-of-the-art cleanroom manufacturing plants, biomedical testing labs, and 50+ year legacy in Chandigarh, India.
+                Take a virtual tour of our cleanroom manufacturing facilities, precision testing laboratories, and 50+ year legacy in Chandigarh, India.
               </p>
             </div>
 
-            {/* Cinema Video Frame */}
+            {/* Video Player Box */}
             <div className="relative mx-auto mt-10 max-w-4xl">
               <div className="relative aspect-video w-full overflow-hidden rounded-3xl border-2 border-[#b5dbe0] bg-black shadow-2xl">
                 <iframe
@@ -1461,7 +1475,7 @@ function Home() {
                 />
               </div>
 
-              {/* Video Info Bar */}
+              {/* Video Info Caption Bar */}
               <div className="mt-5 flex flex-col items-center justify-between gap-4 rounded-2xl border border-[#d8e7e6] bg-white p-4 shadow-sm sm:flex-row">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#079cd4]/15 text-[#079cd4]">
@@ -1499,7 +1513,7 @@ function Home() {
         </section>
 
         {/* ============================================================== */}
-        {/* SIGNATURE PRODUCTS GRID (With In-Card Spec Tabbing)            */}
+        {/* 5. FEATURED PRODUCTS CATALOG GRID                              */}
         {/* ============================================================== */}
         <section className="mx-auto max-w-[1280px] px-5 py-20 lg:px-8 lg:py-24">
           <div className="flex flex-col justify-between gap-4 border-b border-[#d8e7e6] pb-6 sm:flex-row sm:items-end">
@@ -1538,7 +1552,7 @@ function Home() {
         </section>
 
         {/* ============================================================== */}
-        {/* ABOUT ALLENGERS GLOBAL HEALTHCARE                              */}
+        {/* 6. ABOUT ALLENGERS GLOBAL HEALTHCARE                           */}
         {/* ============================================================== */}
         <section id="about" className="mx-auto max-w-[1280px] px-5 py-20 lg:px-8 lg:py-28">
           <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
