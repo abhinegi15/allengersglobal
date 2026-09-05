@@ -8,7 +8,6 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  Cross,
   Gauge,
   Globe2,
   HeartPulse,
@@ -107,14 +106,8 @@ const categories = ['All products', 'Patient Monitoring', 'Urology', 'Neuro diag
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-3" data-testid="link-logo">
-      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0f778b] text-white shadow-sm">
-        <Cross size={22} strokeWidth={2.8} />
-      </span>
-      <span className="leading-none">
-        <span className="block font-display text-[1.15rem] font-extrabold tracking-[-.04em] text-[#14364b]">ALLENGERS</span>
-        <span className="mt-1 block text-[.56rem] font-bold uppercase tracking-[.22em] text-[#0f778b]">Precision in care</span>
-      </span>
+    <Link href="/" className="flex items-center" data-testid="link-logo">
+      <img src="/allengers-logo.png" alt="Allengers — Passion for excellence" className="h-auto w-[146px] object-contain" />
     </Link>
   );
 }
@@ -162,22 +155,23 @@ function Header({ onEnquire }: { onEnquire: () => void }) {
   const navItems = [{ href: '/', label: 'Home' }, { href: '/products', label: 'Products' }];
   return (
     <header className="relative z-30 border-b border-[#d8e7e6] bg-[#f7fbfa]/95 backdrop-blur-md">
+      <div className="h-1 bg-gradient-to-r from-[#079cd4] via-[#079cd4] to-[#e33136]" />
       <div className="mx-auto flex h-[76px] max-w-[1240px] items-center justify-between px-5 lg:px-8">
         <Logo />
         <nav className="hidden items-center gap-9 md:flex">
-          {navItems.map((item) => <Link key={item.href} href={item.href} className={`text-[.73rem] font-bold uppercase tracking-[.1em] transition ${location === item.href ? 'text-[#0f778b]' : 'text-[#5b707d] hover:text-[#0f778b]'}`} data-testid={`link-nav-${item.label.toLowerCase()}`}>{item.label}</Link>)}
-          <a href="#about" className="text-[.73rem] font-bold uppercase tracking-[.1em] text-[#5b707d] transition hover:text-[#0f778b]" data-testid="link-nav-about">Our approach</a>
+          {navItems.map((item) => <Link key={item.href} href={item.href} className={`text-[.73rem] font-bold uppercase tracking-[.1em] transition ${location === item.href ? 'text-[#079cd4]' : 'text-[#5b707d] hover:text-[#079cd4]'}`} data-testid={`link-nav-${item.label.toLowerCase()}`}>{item.label}</Link>)}
+          <a href="#about" className="text-[.73rem] font-bold uppercase tracking-[.1em] text-[#5b707d] transition hover:text-[#079cd4]" data-testid="link-nav-about">Our approach</a>
         </nav>
         <div className="hidden items-center gap-3 md:flex">
           <div className="relative">
-            <button onClick={() => setLanguageOpen(!languageOpen)} className="flex items-center gap-2 rounded-full border border-[#d4e2e3] bg-white px-3.5 py-2 text-xs font-bold text-[#385365]" data-testid="button-language"><Globe2 size={14} className="text-[#0f778b]" /> {language}<ChevronDown size={13} /></button>
-            {languageOpen && <div className="absolute right-0 top-12 w-28 rounded-xl border border-[#d4e2e3] bg-white p-1 shadow-lg">{['EN', 'DE', 'FR'].map((item) => <button key={item} onClick={() => { setLanguage(item); setLanguageOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-xs font-bold hover:bg-[#eaf5f3] ${language === item ? 'text-[#0f778b]' : 'text-[#385365]'}`} data-testid={`button-language-${item.toLowerCase()}`}>{item}</button>)}</div>}
+            <button onClick={() => setLanguageOpen(!languageOpen)} className="flex items-center gap-2 rounded-full border border-[#d4e2e3] bg-white px-3.5 py-2 text-xs font-bold text-[#385365]" data-testid="button-language"><Globe2 size={14} className="text-[#079cd4]" /> {language}<ChevronDown size={13} /></button>
+            {languageOpen && <div className="absolute right-0 top-12 w-28 rounded-xl border border-[#d4e2e3] bg-white p-1 shadow-lg">{['EN', 'DE', 'FR'].map((item) => <button key={item} onClick={() => { setLanguage(item); setLanguageOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-xs font-bold hover:bg-[#eaf5f3] ${language === item ? 'text-[#079cd4]' : 'text-[#385365]'}`} data-testid={`button-language-${item.toLowerCase()}`}>{item}</button>)}</div>}
           </div>
-          <button onClick={onEnquire} className="rounded-full bg-[#14364b] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#0f778b]" data-testid="button-header-enquire">Enquire now</button>
+          <button onClick={onEnquire} className="rounded-full bg-[#079cd4] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#e33136]" data-testid="button-header-enquire">Enquire now</button>
         </div>
         <button onClick={() => setMenuOpen(!menuOpen)} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f3f1] text-[#14364b] md:hidden" aria-label="Toggle menu" data-testid="button-mobile-menu">{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
       </div>
-      {menuOpen && <div className="border-t border-[#d8e7e6] bg-[#f7fbfa] px-5 py-5 md:hidden"><div className="grid gap-4">{navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="text-sm font-bold text-[#14364b]" data-testid={`link-mobile-${item.label.toLowerCase()}`}>{item.label}</Link>)}<a href="#about" onClick={() => setMenuOpen(false)} className="text-sm font-bold text-[#14364b]" data-testid="link-mobile-about">Our approach</a><button onClick={onEnquire} className="mt-2 rounded-full bg-[#0f778b] px-5 py-3 text-sm font-bold text-white" data-testid="button-mobile-enquire">Enquire now</button></div></div>}
+      {menuOpen && <div className="border-t border-[#d8e7e6] bg-[#f7fbfa] px-5 py-5 md:hidden"><div className="grid gap-4">{navItems.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className="text-sm font-bold text-[#14364b]" data-testid={`link-mobile-${item.label.toLowerCase()}`}>{item.label}</Link>)}<a href="#about" onClick={() => setMenuOpen(false)} className="text-sm font-bold text-[#14364b]" data-testid="link-mobile-about">Our approach</a><button onClick={onEnquire} className="mt-2 rounded-full bg-[#079cd4] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e33136]" data-testid="button-mobile-enquire">Enquire now</button></div></div>}
     </header>
   );
 }
