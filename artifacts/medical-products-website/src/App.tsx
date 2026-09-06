@@ -46,7 +46,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'contrast',
+  defaultTheme = 'white',
 }: {
   children: ReactNode;
   defaultTheme?: ThemeMode;
@@ -3053,7 +3053,7 @@ function NotFound() {
 // =============================================================================
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="contrast">
+    <ThemeProvider defaultTheme="white">
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/products" component={ProductsPage} />
