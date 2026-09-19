@@ -525,17 +525,17 @@ function HeaderSearch() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-[210px] sm:max-w-[260px] lg:max-w-[310px]">
+    <div ref={searchRef} className="relative w-full sm:w-[320px] md:w-[380px] lg:w-[440px] xl:w-[480px]">
       <div
-        className={`flex items-center rounded-full border px-3 py-1.5 transition-all duration-200 shadow-xs ${
+        className={`flex h-11 items-center rounded-full border pl-4 pr-2 transition-all duration-200 shadow-xs ${
           theme === 'white'
             ? 'border-slate-300 bg-slate-100/90 text-slate-800 focus-within:border-[#0088cc] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0088cc]/20'
             : 'border-white/15 bg-white/5 text-white focus-within:border-[#38bdf8] focus-within:bg-[#071927] focus-within:ring-2 focus-within:ring-[#38bdf8]/30'
         }`}
       >
         <Search
-          size={15}
-          className={`shrink-0 mr-2 ${
+          size={17}
+          className={`shrink-0 mr-2.5 ${
             theme === 'white' ? 'text-slate-400' : 'text-[#9cbcd0]'
           }`}
         />
@@ -549,7 +549,7 @@ function HeaderSearch() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="What are you looking for?"
-          className={`w-full bg-transparent text-xs font-medium outline-none ${
+          className={`w-full bg-transparent text-xs sm:text-[13px] font-medium outline-none ${
             theme === 'white'
               ? 'text-slate-900 placeholder:text-slate-400'
               : 'text-white placeholder:text-[#8aa7bc]'
@@ -561,10 +561,10 @@ function HeaderSearch() {
               setQuery('');
               setIsOpen(false);
             }}
-            className="cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-white mr-1.5"
+            className="cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-white mr-2 p-1"
             aria-label="Clear search"
           >
-            <X size={13} />
+            <X size={14} />
           </button>
         )}
         <button
@@ -572,7 +572,7 @@ function HeaderSearch() {
             if (filtered.length > 0) handleSelectProduct(filtered[0].slug);
             else setLocation('/products');
           }}
-          className={`flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full transition duration-200 hover:scale-105 ${
+          className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 cursor-pointer items-center justify-center rounded-full transition duration-200 hover:scale-105 ${
             theme === 'white'
               ? 'bg-[#0088cc] text-white hover:bg-[#0077b5]'
               : 'bg-[#079cd4] text-white hover:bg-[#38bdf8]'
@@ -580,33 +580,33 @@ function HeaderSearch() {
           title="Search product"
           aria-label="Search"
         >
-          <ArrowRight size={11} />
+          <ArrowRight size={13} />
         </button>
       </div>
 
-      {/* Floating Instant Search Dropdown */}
+      {/* Floating Instant Search Dropdown (Spacious & Non-Truncated) */}
       {isOpen && (
         <div
-          className={`absolute left-0 right-0 top-full mt-2 z-50 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150 ${
+          className={`absolute left-0 top-full mt-2.5 z-50 w-[340px] sm:w-[480px] md:w-[540px] lg:w-[580px] max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-150 ${
             theme === 'white'
               ? 'border-slate-200 bg-white/98 text-slate-900 shadow-slate-300/60'
               : 'border-[#194e70] bg-[#092233]/98 text-white shadow-black/80'
           }`}
         >
           <div
-            className={`flex items-center justify-between border-b px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider ${
+            className={`flex items-center justify-between border-b px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider ${
               theme === 'white'
                 ? 'border-slate-100 bg-slate-50 text-slate-500'
                 : 'border-white/10 bg-white/5 text-[#9cbcd0]'
             }`}
           >
             <span>{query.trim() ? `Matching Systems (${filtered.length})` : 'Popular Clinical Systems'}</span>
-            <span className="text-[9px] lowercase font-normal opacity-70">click to view</span>
+            <span className="text-[9px] lowercase font-normal opacity-70">click to view specifications</span>
           </div>
 
-          <div className="max-h-[300px] overflow-y-auto p-1.5 space-y-1">
+          <div className="max-h-[340px] overflow-y-auto p-2 space-y-1.5">
             {filtered.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-500">
+              <div className="py-8 text-center text-xs text-slate-500">
                 <p>No products found matching "{query}"</p>
                 <button
                   onClick={() => {
@@ -623,14 +623,14 @@ function HeaderSearch() {
                 <button
                   key={product.slug}
                   onClick={() => handleSelectProduct(product.slug)}
-                  className={`flex w-full cursor-pointer items-center gap-2.5 rounded-xl p-2 text-left transition ${
+                  className={`group flex w-full cursor-pointer items-center gap-3 rounded-xl p-2.5 text-left transition ${
                     theme === 'white'
                       ? 'hover:bg-[#f0f9ff] text-slate-800'
                       : 'hover:bg-white/10 text-white'
                   }`}
                 >
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg p-1 ${
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl p-1.5 transition duration-200 group-hover:scale-105 ${
                       theme === 'white' ? 'bg-slate-100' : 'bg-white/10'
                     }`}
                   >
@@ -641,10 +641,12 @@ function HeaderSearch() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="truncate text-xs font-bold">{product.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs sm:text-sm font-bold truncate">
+                        {product.name}
+                      </span>
                       <span
-                        className={`shrink-0 rounded-md px-1.5 py-0.5 text-[8px] font-extrabold uppercase ${
+                        className={`shrink-0 rounded-md px-2 py-0.5 text-[8px] sm:text-[9px] font-extrabold uppercase tracking-wider ${
                           theme === 'white'
                             ? 'bg-[#0088cc]/10 text-[#0088cc]'
                             : 'bg-[#38bdf8]/20 text-[#38bdf8]'
@@ -654,26 +656,29 @@ function HeaderSearch() {
                       </span>
                     </div>
                     <p
-                      className={`truncate text-[10px] ${
+                      className={`text-[11px] truncate mt-0.5 ${
                         theme === 'white' ? 'text-slate-500' : 'text-[#9cbcd0]'
                       }`}
                     >
-                      {product.highlight}
+                      {product.highlight} • {product.eyebrow}
                     </p>
                   </div>
-                  <ArrowRight
-                    size={13}
-                    className={`shrink-0 opacity-40 transition ${
-                      theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+                  <div
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition duration-200 group-hover:translate-x-1 ${
+                      theme === 'white'
+                        ? 'bg-slate-100 text-[#0088cc] group-hover:bg-[#0088cc] group-hover:text-white'
+                        : 'bg-white/5 text-[#38bdf8] group-hover:bg-[#38bdf8] group-hover:text-white'
                     }`}
-                  />
+                  >
+                    <ArrowRight size={13} />
+                  </div>
                 </button>
               ))
             )}
           </div>
 
           <div
-            className={`border-t px-3 py-2 text-center text-xs ${
+            className={`border-t px-4 py-2.5 text-center text-xs ${
               theme === 'white'
                 ? 'border-slate-100 bg-slate-50/70'
                 : 'border-white/10 bg-white/5'
@@ -682,7 +687,7 @@ function HeaderSearch() {
             <Link
               href="/products"
               onClick={() => setIsOpen(false)}
-              className={`text-[11px] font-bold hover:underline ${
+              className={`text-[11px] sm:text-xs font-bold hover:underline ${
                 theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
               }`}
             >
