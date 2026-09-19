@@ -15,12 +15,14 @@ import {
   Mail,
   MapPin,
   Menu,
+  Moon,
   Phone,
   Play,
   Search,
   ShieldCheck,
   Sparkles,
   Stethoscope,
+  Sun,
   X,
   Zap,
 } from 'lucide-react';
@@ -98,69 +100,7 @@ export function ThemeProvider({
   );
 }
 
-// Floating Client Presentation Switcher Dock
-function FloatingThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
-  const [copied, setCopied] = useState(false);
 
-  const copyThemeLink = (mode: ThemeMode) => {
-    if (typeof window === 'undefined') return;
-    const url = new URL(window.location.href);
-    url.searchParams.set('theme', mode);
-    navigator.clipboard.writeText(url.toString());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <aside
-      aria-label="Theme Switcher"
-      className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full border border-slate-300/90 bg-white/95 p-1.5 shadow-2xl backdrop-blur-md transition-all duration-300 hover:shadow-cyan-500/20"
-    >
-      <div className="hidden items-center gap-1.5 pl-3 pr-1 sm:flex">
-        <span className="h-2 w-2 rounded-full bg-[#0088cc] pulse-dot" />
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-          Client Showcase
-        </span>
-      </div>
-
-      <div className="flex items-center gap-1 rounded-full border border-slate-200/90 bg-slate-100/90 p-0.5">
-        <button
-          onClick={() => setTheme('contrast')}
-          className={`flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition duration-200 ${
-            theme === 'contrast'
-              ? 'bg-[#092233] text-[#38bdf8] shadow-md'
-              : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
-          }`}
-        >
-          <span>🌙 Contrast Edition</span>
-        </button>
-        <button
-          onClick={() => setTheme('white')}
-          className={`flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition duration-200 ${
-            theme === 'white'
-              ? 'bg-[#0088cc] text-white shadow-md'
-              : 'text-slate-600 hover:bg-white/80 hover:text-slate-900'
-          }`}
-        >
-          <span>☀️ Clinical White</span>
-        </button>
-      </div>
-
-      <button
-        onClick={() => copyThemeLink(theme)}
-        title="Copy direct share link for this theme to clipboard"
-        className="flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1.5 text-[11px] font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-[#0088cc]"
-      >
-        {copied ? (
-          <span className="font-bold text-emerald-600">Copied Link!</span>
-        ) : (
-          <span>Share Link</span>
-        )}
-      </button>
-    </aside>
-  );
-}
 
 // =============================================================================
 // REAL ALLENGERS PRODUCT DATA (10 Authentic Systems)
@@ -578,7 +518,7 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           />
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation - Home, Products, About Us */}
         <nav className="hidden items-center gap-8 md:flex">
           <Link
             href="/"
@@ -609,26 +549,6 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
             Products
           </Link>
           <button
-            onClick={() => scrollToSection('specialties')}
-            className={`cursor-pointer text-xs font-bold uppercase tracking-[.1em] transition ${
-              theme === 'white'
-                ? 'text-slate-700 hover:text-[#0088cc]'
-                : 'text-[#9cbcd0] hover:text-white'
-            }`}
-          >
-            Specialties
-          </button>
-          <button
-            onClick={() => scrollToSection('video')}
-            className={`cursor-pointer text-xs font-bold uppercase tracking-[.1em] transition ${
-              theme === 'white'
-                ? 'text-slate-700 hover:text-[#0088cc]'
-                : 'text-[#9cbcd0] hover:text-white'
-            }`}
-          >
-            Company Video
-          </button>
-          <button
             onClick={() => scrollToSection('about')}
             className={`cursor-pointer text-xs font-bold uppercase tracking-[.1em] transition ${
               theme === 'white'
@@ -640,28 +560,23 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           </button>
         </nav>
 
-        {/* Right Action Callouts & Quick Theme Pill */}
+        {/* Right Action Callouts & Dashboard-style Theme Icon Toggle */}
         <div className="hidden items-center gap-4 md:flex">
-          {/* Header Quick Theme Toggle */}
+          {/* Major Dashboard Style Theme Icon Toggle (Half-Moon / Sun) */}
           <button
             onClick={toggleTheme}
-            className={`cursor-pointer flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition ${
+            className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
               theme === 'white'
-                ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'
-                : 'bg-white/10 hover:bg-white/20 text-[#38bdf8] border border-white/20'
+                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:border-slate-400 hover:bg-slate-200 hover:text-[#0088cc] shadow-xs'
+                : 'border-white/15 bg-white/10 text-amber-300 hover:border-white/30 hover:bg-white/20 hover:text-amber-200 shadow-xs'
             }`}
-            title="Toggle theme version for client review"
+            title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+            aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
           >
             {theme === 'white' ? (
-              <>
-                <span>🌙</span>
-                <span>Contrast Theme</span>
-              </>
+              <Moon size={18} className="transition-transform duration-200 hover:-rotate-12" />
             ) : (
-              <>
-                <span>☀️</span>
-                <span>Clinical White</span>
-              </>
+              <Sun size={18} className="transition-transform duration-200 hover:rotate-45" />
             )}
           </button>
 
@@ -689,18 +604,35 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           </button>
         </div>
 
-        {/* Mobile Menu Hamburger */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className={`flex h-10 w-10 items-center justify-center rounded-full transition md:hidden ${
-            theme === 'white'
-              ? 'bg-slate-100 text-slate-800'
-              : 'bg-white/10 text-white'
-          }`}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Mobile Header Controls */}
+        <div className="flex items-center gap-2 md:hidden">
+          {/* Mobile Dashboard Style Theme Icon Toggle */}
+          <button
+            onClick={toggleTheme}
+            className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition duration-200 ${
+              theme === 'white'
+                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-[#0088cc]'
+                : 'border-white/15 bg-white/10 text-amber-300 hover:bg-white/20'
+            }`}
+            title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+            aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+          >
+            {theme === 'white' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+
+          {/* Mobile Menu Hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
+              theme === 'white'
+                ? 'bg-slate-100 text-slate-800'
+                : 'bg-white/10 text-white'
+            }`}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Dropdown */}
@@ -713,19 +645,6 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           }`}
         >
           <div className="grid gap-4">
-            <button
-              onClick={() => {
-                toggleTheme();
-                setMenuOpen(false);
-              }}
-              className="flex items-center justify-between rounded-xl bg-slate-100 dark:bg-white/10 p-3 text-xs font-bold text-left"
-            >
-              <span>Current Theme:</span>
-              <span className="font-extrabold text-[#0088cc]">
-                {theme === 'white' ? '☀️ Clinical White' : '🌙 Contrast Edition'} (Switch)
-              </span>
-            </button>
-
             <Link
               href="/"
               onClick={() => setMenuOpen(false)}
@@ -741,19 +660,10 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
               Products
             </Link>
             <button
-              onClick={() => scrollToSection('specialties')}
-              className="text-left text-sm font-bold"
-            >
-              Specialties
-            </button>
-            <button
-              onClick={() => scrollToSection('video')}
-              className="text-left text-sm font-bold"
-            >
-              Company Video
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
+              onClick={() => {
+                setMenuOpen(false);
+                scrollToSection('about');
+              }}
               className="text-left text-sm font-bold"
             >
               About Us
@@ -1069,8 +979,6 @@ function Shell({
       <Header onEnquire={onEnquire} />
       {children}
       <Footer onEnquire={onEnquire} />
-      {/* Floating Presentation Dock for Instant Switching & Link Sharing */}
-      <FloatingThemeSwitcher />
     </div>
   );
 }
@@ -2169,122 +2077,9 @@ function Home() {
           </div>
         </section>
 
-        {/* ============================================================== */}
-        {/* 4. YOUTUBE CORPORATE CINEMA                                    */}
-        {/* ============================================================== */}
-        <section
-          id="video"
-          className={`py-20 lg:py-24 border-y transition-colors duration-200 ${
-            theme === 'white'
-              ? 'border-slate-200 bg-gradient-to-b from-[#f8fafc] via-[#f1f6fa] to-[#f8fafc] text-slate-800'
-              : 'border-[#0d2a3f] bg-[#081b29] text-white'
-          }`}
-        >
-          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-            <div className="text-center">
-              <span className={`eyebrow ${theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'}`}>
-                Engineering Excellence In Motion
-              </span>
-              <h2
-                className={`mt-2 font-display text-3xl font-extrabold sm:text-4xl ${
-                  theme === 'white' ? 'text-[#0f283d]' : 'text-white'
-                }`}
-              >
-                Allengers Milestones — Corporate Documentary
-              </h2>
-              <p
-                className={`mx-auto mt-3 max-w-2xl text-sm leading-6 ${
-                  theme === 'white' ? 'text-slate-600' : 'text-[#9cbcd0]'
-                }`}
-              >
-                Take a virtual tour of our cleanroom manufacturing facilities, precision testing laboratories, and 50+ year legacy in Chandigarh, India.
-              </p>
-            </div>
-
-            {/* Cinema Video Frame with Ambient Glow */}
-            <div className="relative mx-auto mt-10 max-w-4xl">
-              <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-[#0088cc]/25 via-[#38bdf8]/20 to-[#e31b23]/25 blur-2xl" />
-
-              <div
-                className={`relative aspect-video w-full overflow-hidden rounded-3xl border-2 bg-black shadow-2xl ${
-                  theme === 'white' ? 'border-slate-300' : 'border-[#194e70]'
-                }`}
-              >
-                <iframe
-                  className="h-full w-full"
-                  src="https://www.youtube.com/embed/3rZmaoAjxNM?si=1TqBOxwzX4siMD3H"
-                  title="YouTube video player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              </div>
-
-              {/* Video Info Caption Bar */}
-              <div
-                className={`mt-5 flex flex-col items-center justify-between gap-4 rounded-2xl p-4 shadow-sm backdrop-blur-md sm:flex-row border ${
-                  theme === 'white'
-                    ? 'border-slate-200 bg-white text-slate-800'
-                    : 'border-white/10 bg-white/5 text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-                      theme === 'white'
-                        ? 'bg-[#0088cc]/10 text-[#0088cc]'
-                        : 'bg-[#079cd4]/25 text-[#38bdf8]'
-                    }`}
-                  >
-                    <Play size={20} />
-                  </div>
-                  <div>
-                    <p
-                      className={`text-xs font-bold ${
-                        theme === 'white' ? 'text-slate-900' : 'text-white'
-                      }`}
-                    >
-                      Allengers Milestones — Global Healthcare Pioneer
-                    </p>
-                    <p
-                      className={`text-[.72rem] ${
-                        theme === 'white' ? 'text-slate-500' : 'text-[#9cbcd0]'
-                      }`}
-                    >
-                      Chandigarh Headquarters • 50+ Years Engineering Heritage
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <a
-                    href="https://www.youtube.com/watch?v=3rZmaoAjxNM"
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`flex items-center gap-1.5 text-xs font-bold hover:underline ${
-                      theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
-                    }`}
-                  >
-                    Open on YouTube <ArrowUpRight size={14} />
-                  </a>
-                  <button
-                    onClick={() => setEnquiryModalProduct(products[0].name)}
-                    className={`cursor-pointer rounded-full px-5 py-2 text-xs font-bold text-white transition ${
-                      theme === 'white'
-                        ? 'bg-[#0088cc] hover:bg-[#0077b5]'
-                        : 'bg-[#079cd4] hover:bg-[#0284c7]'
-                    }`}
-                  >
-                    Contact Engineers
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ============================================================== */}
-        {/* 5. FEATURED PRODUCTS CATALOG                                   */}
+        {/* 4. FEATURED PRODUCTS CATALOG                                   */}
         {/* ============================================================== */}
         <section
           className={`py-20 lg:py-24 border-b transition-colors duration-200 ${
@@ -2347,7 +2142,7 @@ function Home() {
         </section>
 
         {/* ============================================================== */}
-        {/* 6. ABOUT ALLENGERS GLOBAL HEALTHCARE                           */}
+        {/* 5. ABOUT ALLENGERS GLOBAL HEALTHCARE                           */}
         {/* ============================================================== */}
         <section
           id="about"
@@ -2464,6 +2259,120 @@ function Home() {
                   <p className="mt-0.5 text-[.7rem] text-[#9fc0d4]">
                     Reliable Indian manufacturing trusted across 36+ export nations.
                   </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================== */}
+        {/* 6. YOUTUBE CORPORATE CINEMA (At Bottom)                        */}
+        {/* ============================================================== */}
+        <section
+          id="video"
+          className={`py-20 lg:py-24 border-t transition-colors duration-200 ${
+            theme === 'white'
+              ? 'border-slate-200 bg-gradient-to-b from-[#f8fafc] via-[#f1f6fa] to-[#f8fafc] text-slate-800'
+              : 'border-[#0d2a3f] bg-[#081b29] text-white'
+          }`}
+        >
+          <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
+            <div className="text-center">
+              <span className={`eyebrow ${theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'}`}>
+                Engineering Excellence In Motion
+              </span>
+              <h2
+                className={`mt-2 font-display text-3xl font-extrabold sm:text-4xl ${
+                  theme === 'white' ? 'text-[#0f283d]' : 'text-white'
+                }`}
+              >
+                Allengers Milestones — Corporate Documentary
+              </h2>
+              <p
+                className={`mx-auto mt-3 max-w-2xl text-sm leading-6 ${
+                  theme === 'white' ? 'text-slate-600' : 'text-[#9cbcd0]'
+                }`}
+              >
+                Take a virtual tour of our cleanroom manufacturing facilities, precision testing laboratories, and 50+ year legacy in Chandigarh, India.
+              </p>
+            </div>
+
+            {/* Cinema Video Frame with Ambient Glow */}
+            <div className="relative mx-auto mt-10 max-w-4xl">
+              <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-[#0088cc]/25 via-[#38bdf8]/20 to-[#e31b23]/25 blur-2xl" />
+
+              <div
+                className={`relative aspect-video w-full overflow-hidden rounded-3xl border-2 bg-black shadow-2xl ${
+                  theme === 'white' ? 'border-slate-300' : 'border-[#194e70]'
+                }`}
+              >
+                <iframe
+                  className="h-full w-full"
+                  src="https://www.youtube.com/embed/3rZmaoAjxNM?si=1TqBOxwzX4siMD3H"
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+
+              {/* Video Info Caption Bar */}
+              <div
+                className={`mt-5 flex flex-col items-center justify-between gap-4 rounded-2xl p-4 shadow-sm backdrop-blur-md sm:flex-row border ${
+                  theme === 'white'
+                    ? 'border-slate-200 bg-white text-slate-800'
+                    : 'border-white/10 bg-white/5 text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                      theme === 'white'
+                        ? 'bg-[#0088cc]/10 text-[#0088cc]'
+                        : 'bg-[#079cd4]/25 text-[#38bdf8]'
+                    }`}
+                  >
+                    <Play size={20} />
+                  </div>
+                  <div>
+                    <p
+                      className={`text-xs font-bold ${
+                        theme === 'white' ? 'text-slate-900' : 'text-white'
+                      }`}
+                    >
+                      Allengers Milestones — Global Healthcare Pioneer
+                    </p>
+                    <p
+                      className={`text-[.72rem] ${
+                        theme === 'white' ? 'text-slate-500' : 'text-[#9cbcd0]'
+                      }`}
+                    >
+                      Chandigarh Headquarters • 50+ Years Engineering Heritage
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <a
+                    href="https://www.youtube.com/watch?v=3rZmaoAjxNM"
+                    target="_blank"
+                    rel="noreferrer"
+                    className={`flex items-center gap-1.5 text-xs font-bold hover:underline ${
+                      theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+                    }`}
+                  >
+                    Open on YouTube <ArrowUpRight size={14} />
+                  </a>
+                  <button
+                    onClick={() => setEnquiryModalProduct(products[0].name)}
+                    className={`cursor-pointer rounded-full px-5 py-2 text-xs font-bold text-white transition ${
+                      theme === 'white'
+                        ? 'bg-[#0088cc] hover:bg-[#0077b5]'
+                        : 'bg-[#079cd4] hover:bg-[#0284c7]'
+                    }`}
+                  >
+                    Contact Engineers
+                  </button>
                 </div>
               </div>
             </div>
