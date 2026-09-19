@@ -476,6 +476,226 @@ const categories = [
 ] as const;
 
 // =============================================================================
+// HEADER SEARCH COMPONENT (Dribbble-Style Instant Search & Navigation)
+// =============================================================================
+function HeaderSearch() {
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+  const { theme } = useTheme();
+
+  // Close when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filtered =
+    query.trim() === ''
+      ? products.slice(0, 5) // Show top recommended systems on focus
+      : products.filter((p) =>
+          `${p.name} ${p.shortName} ${p.category} ${p.eyebrow} ${p.highlight} ${p.specs.join(' ')}`
+            .toLowerCase()
+            .includes(query.toLowerCase())
+        );
+
+  const handleSelectProduct = (slug: string) => {
+    setLocation(`/products/${slug}`);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      if (filtered.length > 0) {
+        handleSelectProduct(filtered[0].slug);
+      } else {
+        setLocation('/products');
+        setIsOpen(false);
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
+
+  return (
+    <div ref={searchRef} className="relative w-full max-w-[210px] sm:max-w-[260px] lg:max-w-[310px]">
+      <div
+        className={`flex items-center rounded-full border px-3 py-1.5 transition-all duration-200 shadow-xs ${
+          theme === 'white'
+            ? 'border-slate-300 bg-slate-100/90 text-slate-800 focus-within:border-[#0088cc] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#0088cc]/20'
+            : 'border-white/15 bg-white/5 text-white focus-within:border-[#38bdf8] focus-within:bg-[#071927] focus-within:ring-2 focus-within:ring-[#38bdf8]/30'
+        }`}
+      >
+        <Search
+          size={15}
+          className={`shrink-0 mr-2 ${
+            theme === 'white' ? 'text-slate-400' : 'text-[#9cbcd0]'
+          }`}
+        />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={handleKeyDown}
+          placeholder="What are you looking for?"
+          className={`w-full bg-transparent text-xs font-medium outline-none ${
+            theme === 'white'
+              ? 'text-slate-900 placeholder:text-slate-400'
+              : 'text-white placeholder:text-[#8aa7bc]'
+          }`}
+        />
+        {query && (
+          <button
+            onClick={() => {
+              setQuery('');
+              setIsOpen(false);
+            }}
+            className="cursor-pointer text-slate-400 hover:text-slate-600 dark:hover:text-white mr-1.5"
+            aria-label="Clear search"
+          >
+            <X size={13} />
+          </button>
+        )}
+        <button
+          onClick={() => {
+            if (filtered.length > 0) handleSelectProduct(filtered[0].slug);
+            else setLocation('/products');
+          }}
+          className={`flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full transition duration-200 hover:scale-105 ${
+            theme === 'white'
+              ? 'bg-[#0088cc] text-white hover:bg-[#0077b5]'
+              : 'bg-[#079cd4] text-white hover:bg-[#38bdf8]'
+          }`}
+          title="Search product"
+          aria-label="Search"
+        >
+          <ArrowRight size={11} />
+        </button>
+      </div>
+
+      {/* Floating Instant Search Dropdown */}
+      {isOpen && (
+        <div
+          className={`absolute left-0 right-0 top-full mt-2 z-50 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150 ${
+            theme === 'white'
+              ? 'border-slate-200 bg-white/98 text-slate-900 shadow-slate-300/60'
+              : 'border-[#194e70] bg-[#092233]/98 text-white shadow-black/80'
+          }`}
+        >
+          <div
+            className={`flex items-center justify-between border-b px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider ${
+              theme === 'white'
+                ? 'border-slate-100 bg-slate-50 text-slate-500'
+                : 'border-white/10 bg-white/5 text-[#9cbcd0]'
+            }`}
+          >
+            <span>{query.trim() ? `Matching Systems (${filtered.length})` : 'Popular Clinical Systems'}</span>
+            <span className="text-[9px] lowercase font-normal opacity-70">click to view</span>
+          </div>
+
+          <div className="max-h-[300px] overflow-y-auto p-1.5 space-y-1">
+            {filtered.length === 0 ? (
+              <div className="py-6 text-center text-xs text-slate-500">
+                <p>No products found matching "{query}"</p>
+                <button
+                  onClick={() => {
+                    setLocation('/products');
+                    setIsOpen(false);
+                  }}
+                  className="mt-2 text-xs font-bold text-[#0088cc] hover:underline"
+                >
+                  Browse all 10 systems →
+                </button>
+              </div>
+            ) : (
+              filtered.map((product) => (
+                <button
+                  key={product.slug}
+                  onClick={() => handleSelectProduct(product.slug)}
+                  className={`flex w-full cursor-pointer items-center gap-2.5 rounded-xl p-2 text-left transition ${
+                    theme === 'white'
+                      ? 'hover:bg-[#f0f9ff] text-slate-800'
+                      : 'hover:bg-white/10 text-white'
+                  }`}
+                >
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg p-1 ${
+                      theme === 'white' ? 'bg-slate-100' : 'bg-white/10'
+                    }`}
+                  >
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="truncate text-xs font-bold">{product.name}</span>
+                      <span
+                        className={`shrink-0 rounded-md px-1.5 py-0.5 text-[8px] font-extrabold uppercase ${
+                          theme === 'white'
+                            ? 'bg-[#0088cc]/10 text-[#0088cc]'
+                            : 'bg-[#38bdf8]/20 text-[#38bdf8]'
+                        }`}
+                      >
+                        {product.category}
+                      </span>
+                    </div>
+                    <p
+                      className={`truncate text-[10px] ${
+                        theme === 'white' ? 'text-slate-500' : 'text-[#9cbcd0]'
+                      }`}
+                    >
+                      {product.highlight}
+                    </p>
+                  </div>
+                  <ArrowRight
+                    size={13}
+                    className={`shrink-0 opacity-40 transition ${
+                      theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+                    }`}
+                  />
+                </button>
+              ))
+            )}
+          </div>
+
+          <div
+            className={`border-t px-3 py-2 text-center text-xs ${
+              theme === 'white'
+                ? 'border-slate-100 bg-slate-50/70'
+                : 'border-white/10 bg-white/5'
+            }`}
+          >
+            <Link
+              href="/products"
+              onClick={() => setIsOpen(false)}
+              className={`text-[11px] font-bold hover:underline ${
+                theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+              }`}
+            >
+              Browse Complete Allengers Catalog (10 Products) →
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =============================================================================
 // HEADER NAVIGATION (Dual Theme Responsive)
 // =============================================================================
 function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
@@ -506,132 +726,142 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
       {/* Brand Top Line in Genuine Allengers Blue & Crimson Red */}
       <div className="h-[3px] w-full bg-gradient-to-r from-[#0088cc] via-[#38bdf8] to-[#e31b23]" />
 
-      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between px-5 lg:px-8">
-        {/* Logo - Natural Color in White Theme, Inverted in Contrast Theme */}
-        <Link href="/" className="flex items-center gap-3">
-          <img
-            src="/allengers-logo.png"
-            alt="Allengers Global Healthcare"
-            className={`h-10 w-auto object-contain transition hover:opacity-90 sm:h-11 ${
-              theme === 'contrast' ? 'brightness-0 invert' : ''
-            }`}
-          />
-        </Link>
-
-        {/* Desktop Navigation - Home, Products, About Us */}
-        <nav className="hidden items-center gap-8 md:flex">
-          <Link
-            href="/"
-            className={`text-xs font-bold uppercase tracking-[.1em] transition ${
-              theme === 'white'
-                ? location === '/'
-                  ? 'text-[#0088cc] border-b-2 border-[#0088cc] pb-1 font-extrabold'
-                  : 'text-slate-700 hover:text-[#0088cc]'
-                : location === '/'
-                ? 'text-[#38bdf8]'
-                : 'text-[#9cbcd0] hover:text-white'
-            }`}
-          >
-            Home
+      <div className="mx-auto flex h-[76px] max-w-[1280px] items-center justify-between gap-4 px-5 lg:px-8">
+        {/* Left Side: Logo & Dribbble-Style Search Input */}
+        <div className="flex items-center gap-4 lg:gap-7">
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <img
+              src="/allengers-logo.png"
+              alt="Allengers Global Healthcare"
+              className={`h-10 w-auto object-contain transition hover:opacity-90 sm:h-11 ${
+                theme === 'contrast' ? 'brightness-0 invert' : ''
+              }`}
+            />
           </Link>
-          <Link
-            href="/products"
-            className={`text-xs font-bold uppercase tracking-[.1em] transition ${
-              theme === 'white'
-                ? location.startsWith('/products')
-                  ? 'text-[#0088cc] border-b-2 border-[#0088cc] pb-1 font-extrabold'
-                  : 'text-slate-700 hover:text-[#0088cc]'
-                : location.startsWith('/products')
-                ? 'text-[#38bdf8]'
-                : 'text-[#9cbcd0] hover:text-white'
-            }`}
-          >
-            Products
-          </Link>
-          <button
-            onClick={() => scrollToSection('about')}
-            className={`cursor-pointer text-xs font-bold uppercase tracking-[.1em] transition ${
-              theme === 'white'
-                ? 'text-slate-700 hover:text-[#0088cc]'
-                : 'text-[#9cbcd0] hover:text-white'
-            }`}
-          >
-            About Us
-          </button>
-        </nav>
 
-        {/* Right Action Callouts & Dashboard-style Theme Icon Toggle */}
-        <div className="hidden items-center gap-4 md:flex">
-          {/* Major Dashboard Style Theme Icon Toggle (Half-Moon / Sun) */}
-          <button
-            onClick={toggleTheme}
-            className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
-              theme === 'white'
-                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:border-slate-400 hover:bg-slate-200 hover:text-[#0088cc] shadow-xs'
-                : 'border-white/15 bg-white/10 text-amber-300 hover:border-white/30 hover:bg-white/20 hover:text-amber-200 shadow-xs'
-            }`}
-            title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
-            aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
-          >
-            {theme === 'white' ? (
-              <Moon size={18} className="transition-transform duration-200 hover:-rotate-12" />
-            ) : (
-              <Sun size={18} className="transition-transform duration-200 hover:rotate-45" />
-            )}
-          </button>
-
-          <a
-            href="tel:18002668800"
-            className={`flex items-center gap-2 text-xs font-bold transition ${
-              theme === 'white'
-                ? 'text-slate-700 hover:text-[#0088cc]'
-                : 'text-[#b4d2e5] hover:text-[#38bdf8]'
-            }`}
-          >
-            <Phone size={14} className={theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'} />
-            <span>1800-266-8800</span>
-          </a>
-
-          <button
-            onClick={() => onEnquire()}
-            className={`cursor-pointer rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:shadow-md ${
-              theme === 'white'
-                ? 'bg-[#0088cc] hover:bg-[#0077b5]'
-                : 'bg-[#079cd4] hover:bg-[#0284c7]'
-            }`}
-          >
-            Enquire Now
-          </button>
+          {/* Dribbble-style Header Search Bar */}
+          <div className="hidden sm:block">
+            <HeaderSearch />
+          </div>
         </div>
 
-        {/* Mobile Header Controls */}
-        <div className="flex items-center gap-2 md:hidden">
-          {/* Mobile Dashboard Style Theme Icon Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition duration-200 ${
-              theme === 'white'
-                ? 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-[#0088cc]'
-                : 'border-white/15 bg-white/10 text-amber-300 hover:bg-white/20'
-            }`}
-            title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
-            aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
-          >
-            {theme === 'white' ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
+        {/* Right Side: Desktop Navigation, Dashboard Theme Toggle, Phone, Enquire */}
+        <div className="flex items-center gap-5 lg:gap-7">
+          {/* Desktop Navigation - Home, Products, About Us */}
+          <nav className="hidden items-center gap-7 md:flex">
+            <Link
+              href="/"
+              className={`text-xs font-bold uppercase tracking-[.1em] transition ${
+                theme === 'white'
+                  ? location === '/'
+                    ? 'text-[#0088cc] border-b-2 border-[#0088cc] pb-1 font-extrabold'
+                    : 'text-slate-700 hover:text-[#0088cc]'
+                  : location === '/'
+                  ? 'text-[#38bdf8]'
+                  : 'text-[#9cbcd0] hover:text-white'
+              }`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/products"
+              className={`text-xs font-bold uppercase tracking-[.1em] transition ${
+                theme === 'white'
+                  ? location.startsWith('/products')
+                    ? 'text-[#0088cc] border-b-2 border-[#0088cc] pb-1 font-extrabold'
+                    : 'text-slate-700 hover:text-[#0088cc]'
+                  : location.startsWith('/products')
+                  ? 'text-[#38bdf8]'
+                  : 'text-[#9cbcd0] hover:text-white'
+              }`}
+            >
+              Products
+            </Link>
+            <button
+              onClick={() => scrollToSection('about')}
+              className={`cursor-pointer text-xs font-bold uppercase tracking-[.1em] transition ${
+                theme === 'white'
+                  ? 'text-slate-700 hover:text-[#0088cc]'
+                  : 'text-[#9cbcd0] hover:text-white'
+              }`}
+            >
+              About Us
+            </button>
+          </nav>
 
-          {/* Mobile Menu Hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
-              theme === 'white'
-                ? 'bg-slate-100 text-slate-800'
-                : 'bg-white/10 text-white'
-            }`}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Right Action Callouts & Dashboard-style Theme Icon Toggle */}
+          <div className="hidden items-center gap-3.5 lg:flex">
+            {/* Major Dashboard Style Theme Icon Toggle (Half-Moon / Sun) */}
+            <button
+              onClick={toggleTheme}
+              className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
+                theme === 'white'
+                  ? 'border-slate-300 bg-slate-100 text-slate-700 hover:border-slate-400 hover:bg-slate-200 hover:text-[#0088cc] shadow-xs'
+                  : 'border-white/15 bg-white/10 text-amber-300 hover:border-white/30 hover:bg-white/20 hover:text-amber-200 shadow-xs'
+              }`}
+              title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+              aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+            >
+              {theme === 'white' ? (
+                <Moon size={18} className="transition-transform duration-200 hover:-rotate-12" />
+              ) : (
+                <Sun size={18} className="transition-transform duration-200 hover:rotate-45" />
+              )}
+            </button>
+
+            <a
+              href="tel:18002668800"
+              className={`flex items-center gap-1.5 text-xs font-bold transition ${
+                theme === 'white'
+                  ? 'text-slate-700 hover:text-[#0088cc]'
+                  : 'text-[#b4d2e5] hover:text-[#38bdf8]'
+              }`}
+            >
+              <Phone size={14} className={theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'} />
+              <span>1800-266-8800</span>
+            </a>
+
+            <button
+              onClick={() => onEnquire()}
+              className={`cursor-pointer rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-xs transition hover:shadow-md ${
+                theme === 'white'
+                  ? 'bg-[#0088cc] hover:bg-[#0077b5]'
+                  : 'bg-[#079cd4] hover:bg-[#0284c7]'
+              }`}
+            >
+              Enquire Now
+            </button>
+          </div>
+
+          {/* Mobile & Tablet Header Controls */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {/* Mobile Dashboard Style Theme Icon Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border transition duration-200 ${
+                theme === 'white'
+                  ? 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-[#0088cc]'
+                  : 'border-white/15 bg-white/10 text-amber-300 hover:bg-white/20'
+              }`}
+              title={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+              aria-label={theme === 'white' ? 'Switch to Dark / Contrast Mode' : 'Switch to Light / Clinical White Mode'}
+            >
+              {theme === 'white' ? <Moon size={18} /> : <Sun size={18} />}
+            </button>
+
+            {/* Mobile Menu Hamburger */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`flex h-10 w-10 items-center justify-center rounded-full transition ${
+                theme === 'white'
+                  ? 'bg-slate-100 text-slate-800'
+                  : 'bg-white/10 text-white'
+              }`}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -645,6 +875,11 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           }`}
         >
           <div className="grid gap-4">
+            {/* Mobile Search Bar */}
+            <div className="pb-1">
+              <HeaderSearch />
+            </div>
+
             <Link
               href="/"
               onClick={() => setMenuOpen(false)}
@@ -1187,11 +1422,11 @@ const carouselSlides = [
   {
     slug: 'blaze-prime',
     shortTitle: 'BLAZE-prime Holmium',
-    title: 'BLAZE-prime Holmium Laser Platform',
+    title: 'BLAZE-prime Holmium Laser',
     category: 'Urology Flagship',
-    tagline: 'Super-Imposed Pulse Modulation for Superior Stone Fragmentation & HoLEP',
+    tagline: 'High-Efficiency Laser for Lithotripsy & HoLEP',
     description:
-      'Allengers BLAZE-prime Holmium laser is used to generate laser beam which is intended for lithotripsy and HoLEP. Advanced compressor based turbo cooling system to enhance laser beam quality and efficiency of the laser. BLAZE-prime has an Advanced long pulse laser with a super imposed modulated pulse to minimize retropulsion and enhanced the ablation rate.',
+      'Advanced turbo cooling and modulated pulse technology for precision stone fragmentation and minimal retropulsion.',
     image: '/products/blaze-prime-nobg-1.png',
     secondaryImage: '/products/blaze-prime-nobg-2.png',
     // Contrast mode
@@ -1203,16 +1438,16 @@ const carouselSlides = [
     whiteTitleColor: '#0088cc',
     whiteBadgeColor: 'bg-[#0088cc]/10 text-[#0088cc] border-[#0088cc]/20',
     badge: 'Urology Flagship',
-    specs: ['Up to 100W Output Power', '0.1 J – 5.0 J Pulse Energy', 'Dual Inverter Turbo Cooling', '12” Swivel Touchscreen'],
+    specs: ['Up to 100W Power', 'Turbo Cooling System', '12” Swivel Screen'],
   },
   {
     slug: 'fiberlaze-plus',
     shortTitle: 'FiberLAZE+ Thulium',
     title: 'FiberLAZE+ Thulium Fiber Laser',
     category: 'Endoscopic Surgery',
-    tagline: 'Extreme 2500 Hz High-Frequency Dusting with Hybrid Air Cooling',
+    tagline: '2500 Hz High-Frequency Dusting',
     description:
-      'Delivers sub-millimeter stone dust for spontaneous natural passage and bloodless soft tissue resection with ultra-shallow (<0.2 mm) penetration depth.',
+      'Ultra-fine stone dusting and clean soft tissue resection with shallow penetration depth.',
     image: '/products/fiberlaze-thulium-laser-clean.png',
     accentBg: 'from-[#082d30] via-[#0d4246] to-[#062123]',
     accentColor: '#2dd4bf',
@@ -1221,16 +1456,16 @@ const carouselSlides = [
     whiteTitleColor: '#0d9488',
     whiteBadgeColor: 'bg-[#0d9488]/10 text-[#0d9488] border-[#0d9488]/20',
     badge: 'High Frequency Laser',
-    specs: ['Up to 2500 Hz Pulse Rate', 'Hybrid Air-Cooled System', 'Minimal Tissue Carbonization', 'Single-Phase 220V Power'],
+    specs: ['2500 Hz Pulse Rate', 'Hybrid Air-Cooled', 'Minimal Carbonization'],
   },
   {
     slug: 'neuroplot',
     shortTitle: 'VIRGO 32-Ch EEG',
     title: 'Neuroplot / VIRGO EEG System',
     category: 'Neuro Diagnostics',
-    tagline: '32-Channel DSP Brain Wave Mapping & Clinical Seizure Localization',
+    tagline: '32-Channel Clinical Brain Mapping',
     description:
-      'Hospital-grade clinical electroencephalograph station with synchronized HD video, automated artifact rejection, and pre-configured pediatric and adult ICU montages.',
+      'High-precision electroencephalograph station with synchronized HD video and automated artifact rejection.',
     image: '/products/virgo-electroencephalograph-clean.png',
     accentBg: 'from-[#141b3b] via-[#1c2754] to-[#0e132b]',
     accentColor: '#818cf8',
@@ -1239,16 +1474,16 @@ const carouselSlides = [
     whiteTitleColor: '#4f46e5',
     whiteBadgeColor: 'bg-[#4f46e5]/10 text-[#4f46e5] border-[#4f46e5]/20',
     badge: 'Neurology Flagship',
-    specs: ['32 / 24 Channel DSP Headbox', 'Spectral Brain Mapping', 'Full HD Medical Display', 'Universal EDF / PDF Export'],
+    specs: ['32-Channel DSP Headbox', 'Spectral Brain Mapping', 'Full HD Display'],
   },
   {
     slug: 'gemini-treadmill',
     shortTitle: 'Gemini TMT Stress',
     title: 'Gemini TMT Cardiac Stress System',
     category: 'Cardiology Diagnostics',
-    tagline: 'Heavy-Duty 20 km/h Treadmill Stress Test with Stable Baseline Filter',
+    tagline: 'Heavy-Duty 12-Lead Cardiac Stress Test',
     description:
-      'Over 30 years of manufacturing excellence: GEMINI-A-DX AC drive, 12-lead simultaneous stress ECG recording, and standard Bruce stress protocols.',
+      'Simultaneous 12-lead stress ECG recording with stable baseline filtering and AC drive treadmill.',
     image: '/products/gemini-treadmill-tmt-clean.png',
     accentBg: 'from-[#0b2b20] via-[#103d2e] to-[#081e17]',
     accentColor: '#34d399',
@@ -1257,16 +1492,16 @@ const carouselSlides = [
     whiteTitleColor: '#059669',
     whiteBadgeColor: 'bg-[#059669]/10 text-[#059669] border-[#059669]/20',
     badge: 'Cardiology Classic',
-    specs: ['20 km/h AC High-Torque Drive', '0% to 22% Grade Elevation', '12-Lead Real-time Stress ECG', '200 kg Patient Deck Rating'],
+    specs: ['20 km/h AC Drive', '12-Lead Stress ECG', '200 kg Patient Deck'],
   },
   {
     slug: 'libra-mpm',
     shortTitle: 'LIBRA 15.6” MPM',
     title: 'Libra Smart / BRIO Multipara Monitor',
     category: 'Patient Monitoring',
-    tagline: '15.6” Anti-Glare Touchscreen with 120 Hours Continuous Trend Storage',
+    tagline: '15.6” Bedside Vital Signs Station',
     description:
-      'Clinical-grade bedside vital signs monitoring delivering 8 real-time waveforms, 360° visual alarm beacon, and Central Nursing Station (CNS) wired & wireless telemetry.',
+      '8 real-time waveforms, 360° visual alarm beacon, and 120-hour continuous trend telemetry.',
     image: '/products/libra-multipara-monitor-clean.png',
     accentBg: 'from-[#0a2833] via-[#0e3948] to-[#071c24]',
     accentColor: '#38bdf8',
@@ -1275,7 +1510,7 @@ const carouselSlides = [
     whiteTitleColor: '#0088cc',
     whiteBadgeColor: 'bg-[#0088cc]/10 text-[#0088cc] border-[#0088cc]/20',
     badge: 'Critical Care Monitoring',
-    specs: ['15.6” High-Brightness Display', '8 Real-time Waveforms', '120 Hours Graphical Trends', 'Central Station Networking'],
+    specs: ['15.6” Anti-Glare Screen', '8 Waveforms', 'CNS Networking'],
   },
 ];
 
@@ -1762,6 +1997,147 @@ function StatsBar() {
               Certified Medical Quality
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// END PRODUCT MARQUEE SLIDER (Dribbble-Style Running Card Carousel at Bottom)
+// =============================================================================
+function EndProductMarqueeSlider() {
+  const { theme } = useTheme();
+  const doubleProducts = [...products, ...products];
+
+  return (
+    <section
+      className={`py-16 lg:py-20 border-t overflow-hidden transition-colors duration-200 ${
+        theme === 'white'
+          ? 'border-slate-200 bg-white text-slate-800'
+          : 'border-[#0d2a3f] bg-[#071927] text-white'
+      }`}
+    >
+      <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end mb-8">
+          <div>
+            <span className={`eyebrow ${theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'}`}>
+              Allengers Equipment Ecosystem
+            </span>
+            <h2
+              className={`mt-1 font-display text-2xl font-extrabold sm:text-3xl ${
+                theme === 'white' ? 'text-[#0f283d]' : 'text-white'
+              }`}
+            >
+              Clinical Systems in Motion
+            </h2>
+          </div>
+          <Link
+            href="/products"
+            className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider hover:underline ${
+              theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+            }`}
+          >
+            View All 10 Products <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+
+      {/* Infinite Horizontal Running Track */}
+      <div className="group relative w-full overflow-hidden py-4">
+        {/* Soft edge fade masks */}
+        <div
+          className={`pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-28 bg-gradient-to-r ${
+            theme === 'white'
+              ? 'from-white via-white/80 to-transparent'
+              : 'from-[#071927] via-[#071927]/80 to-transparent'
+          }`}
+        />
+        <div
+          className={`pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-28 bg-gradient-to-l ${
+            theme === 'white'
+              ? 'from-white via-white/80 to-transparent'
+              : 'from-[#071927] via-[#071927]/80 to-transparent'
+          }`}
+        />
+
+        <div
+          className="flex w-max marquee hover:[animation-play-state:paused]"
+          style={{ animationDuration: '45s' }}
+        >
+          {doubleProducts.map((prod, idx) => (
+            <div key={`${prod.slug}-${idx}`} className="px-3 shrink-0">
+              <Link
+                href={`/products/${prod.slug}`}
+                className={`group/card flex flex-col justify-between w-[280px] sm:w-[320px] h-[340px] rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                  theme === 'white'
+                    ? 'border-slate-200 bg-[#f8fafc] hover:border-[#0088cc]/60 hover:bg-white hover:shadow-cyan-500/10'
+                    : 'border-[#143d5c] bg-[#092233] hover:border-[#38bdf8]/60 hover:bg-[#0c2a3e] hover:shadow-black/50'
+                }`}
+              >
+                {/* Image Showcase Stage */}
+                <div
+                  className={`relative flex h-[180px] w-full items-center justify-center rounded-xl overflow-hidden p-4 ${
+                    theme === 'white' ? 'bg-white' : 'bg-black/20'
+                  }`}
+                >
+                  <img
+                    src={prod.image}
+                    alt={prod.name}
+                    className="h-full w-full object-contain transition-transform duration-300 group-hover/card:scale-110 drop-shadow-md"
+                  />
+                  <span
+                    className={`absolute top-2.5 left-2.5 rounded-md px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${
+                      theme === 'white'
+                        ? 'bg-[#0088cc]/10 text-[#0088cc]'
+                        : 'bg-[#38bdf8]/20 text-[#38bdf8]'
+                    }`}
+                  >
+                    {prod.category}
+                  </span>
+                </div>
+
+                {/* Info */}
+                <div className="mt-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3
+                      className={`font-display text-base font-bold line-clamp-1 transition group-hover/card:text-[#0088cc] ${
+                        theme === 'white' ? 'text-slate-900' : 'text-white'
+                      }`}
+                    >
+                      {prod.name}
+                    </h3>
+                    <p
+                      className={`mt-1 text-xs line-clamp-1 ${
+                        theme === 'white' ? 'text-slate-500' : 'text-[#9cbcd0]'
+                      }`}
+                    >
+                      {prod.highlight}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between border-t pt-3 border-slate-200/60 dark:border-white/10">
+                    <span
+                      className={`text-[11px] font-bold ${
+                        theme === 'white' ? 'text-[#0088cc]' : 'text-[#38bdf8]'
+                      }`}
+                    >
+                      View Details
+                    </span>
+                    <div
+                      className={`flex h-6 w-6 items-center justify-center rounded-full transition group-hover/card:translate-x-1 ${
+                        theme === 'white'
+                          ? 'bg-[#0088cc]/10 text-[#0088cc]'
+                          : 'bg-white/10 text-[#38bdf8]'
+                      }`}
+                    >
+                      <ArrowRight size={12} />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -2378,6 +2754,11 @@ function Home() {
             </div>
           </div>
         </section>
+
+        {/* ============================================================== */}
+        {/* 7. LIVE PRODUCT MARQUEE CAROUSEL (Dribbble-Style at Bottom)    */}
+        {/* ============================================================== */}
+        <EndProductMarqueeSlider />
       </main>
 
       {/* In-Page Modal */}
