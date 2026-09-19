@@ -7,7 +7,6 @@ import {
   Award,
   BadgeCheck,
   Check,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -701,154 +700,6 @@ function HeaderSearch() {
   );
 }
 
-// =============================================================================
-// LANGUAGE SELECTOR COMPONENT (Circular Flag + Code + Dropdown)
-// =============================================================================
-type LanguageOption = {
-  code: string;
-  name: string;
-  flag: string;
-  svgFlag?: boolean;
-};
-
-const supportedLanguages: LanguageOption[] = [
-  { code: 'EN', name: 'English (US)', flag: '🇺🇸', svgFlag: true },
-  { code: 'ES', name: 'Español', flag: '🇪🇸' },
-  { code: 'FR', name: 'Français', flag: '🇫🇷' },
-  { code: 'DE', name: 'Deutsch', flag: '🇩🇪' },
-  { code: 'AR', name: 'العربية', flag: '🇸🇦' },
-  { code: 'HI', name: 'हिन्दी', flag: '🇮🇳' },
-];
-
-function USFlagCircle({ className = 'h-4 w-4' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" className={`rounded-full shrink-0 shadow-xs ${className}`}>
-      <clipPath id="us-flag-round">
-        <circle cx="32" cy="32" r="32" />
-      </clipPath>
-      <g clipPath="url(#us-flag-round)">
-        <rect width="64" height="64" fill="#bd3d44" />
-        <path
-          d="M0,4.92h64M0,14.77h64M0,24.62h64M0,34.46h64M0,44.31h64M0,54.15h64"
-          stroke="#fff"
-          strokeWidth="4.92"
-        />
-        <rect width="28" height="35" fill="#192f5d" />
-        <circle cx="6" cy="6" r="1.5" fill="#fff" />
-        <circle cx="14" cy="6" r="1.5" fill="#fff" />
-        <circle cx="22" cy="6" r="1.5" fill="#fff" />
-        <circle cx="10" cy="12" r="1.5" fill="#fff" />
-        <circle cx="18" cy="12" r="1.5" fill="#fff" />
-        <circle cx="6" cy="18" r="1.5" fill="#fff" />
-        <circle cx="14" cy="18" r="1.5" fill="#fff" />
-        <circle cx="22" cy="18" r="1.5" fill="#fff" />
-        <circle cx="10" cy="24" r="1.5" fill="#fff" />
-        <circle cx="18" cy="24" r="1.5" fill="#fff" />
-        <circle cx="6" cy="30" r="1.5" fill="#fff" />
-        <circle cx="14" cy="30" r="1.5" fill="#fff" />
-        <circle cx="22" cy="30" r="1.5" fill="#fff" />
-      </g>
-    </svg>
-  );
-}
-
-function LanguageSelector() {
-  const [selected, setSelected] = useState<LanguageOption>(supportedLanguages[0]);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  return (
-    <div ref={dropdownRef} className="relative inline-block">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`cursor-pointer flex h-9 items-center gap-2 rounded-xl border px-2.5 py-1.5 transition-all duration-200 hover:scale-105 active:scale-95 ${
-          theme === 'white'
-            ? 'border-slate-300 bg-slate-100/90 text-slate-700 hover:border-slate-400 hover:bg-slate-200 shadow-xs'
-            : 'border-white/15 bg-white/10 text-white hover:border-white/30 hover:bg-white/20 shadow-xs'
-        }`}
-        title="Select Language"
-        aria-label="Select Language"
-      >
-        {selected.svgFlag ? (
-          <USFlagCircle className="h-4 w-4" />
-        ) : (
-          <span className="text-sm leading-none">{selected.flag}</span>
-        )}
-        <span className="text-xs font-bold tracking-wider">{selected.code}</span>
-        <ChevronDown
-          size={14}
-          className={`shrink-0 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-[#0088cc]' : 'opacity-70'
-          }`}
-        />
-      </button>
-
-      {isOpen && (
-        <div
-          className={`absolute right-0 top-full mt-2 z-50 w-44 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150 ${
-            theme === 'white'
-              ? 'border-slate-200 bg-white/98 text-slate-800 shadow-slate-300/60'
-              : 'border-[#194e70] bg-[#092233]/98 text-white shadow-black/80'
-          }`}
-        >
-          <div
-            className={`border-b px-3 py-2 text-[10px] font-bold uppercase tracking-wider ${
-              theme === 'white'
-                ? 'border-slate-100 bg-slate-50 text-slate-500'
-                : 'border-white/10 bg-white/5 text-[#9cbcd0]'
-            }`}
-          >
-            Select Language
-          </div>
-
-          <div className="p-1 space-y-0.5">
-            {supportedLanguages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => {
-                  setSelected(lang);
-                  setIsOpen(false);
-                }}
-                className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition ${
-                  selected.code === lang.code
-                    ? theme === 'white'
-                      ? 'bg-[#0088cc]/10 font-bold text-[#0088cc]'
-                      : 'bg-[#38bdf8]/20 font-bold text-[#38bdf8]'
-                    : theme === 'white'
-                    ? 'text-slate-700 hover:bg-slate-100'
-                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  {lang.svgFlag ? (
-                    <USFlagCircle className="h-4 w-4" />
-                  ) : (
-                    <span className="text-sm leading-none">{lang.flag}</span>
-                  )}
-                  <span>{lang.name}</span>
-                </div>
-                {selected.code === lang.code && (
-                  <Check size={14} className="shrink-0 text-emerald-500" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // =============================================================================
 // HEADER NAVIGATION (Dual Theme Responsive)
@@ -945,10 +796,7 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
           </nav>
 
           {/* Right Action Callouts & Dashboard-style Theme Icon Toggle */}
-          <div className="hidden items-center gap-3 lg:flex">
-            {/* Language Selector Pill (Flag + Code + Arrow) */}
-            <LanguageSelector />
-
+          <div className="hidden items-center gap-3.5 lg:flex">
             {/* Major Dashboard Style Theme Icon Toggle (Half-Moon / Sun) */}
             <button
               onClick={toggleTheme}
@@ -993,9 +841,6 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
 
           {/* Mobile & Tablet Header Controls */}
           <div className="flex items-center gap-2 lg:hidden">
-            {/* Mobile Language Selector */}
-            <LanguageSelector />
-
             {/* Mobile Dashboard Style Theme Icon Toggle */}
             <button
               onClick={toggleTheme}
@@ -1039,12 +884,6 @@ function Header({ onEnquire }: { onEnquire: (productName?: string) => void }) {
             {/* Mobile Search Bar */}
             <div className="pb-1">
               <HeaderSearch />
-            </div>
-
-            {/* Mobile Language Selection Row */}
-            <div className="flex items-center justify-between py-1 border-b border-slate-200/80 dark:border-white/10 text-xs font-bold">
-              <span className={theme === 'white' ? 'text-slate-600' : 'text-[#9cbcd0]'}>Select Language</span>
-              <LanguageSelector />
             </div>
 
             <Link
